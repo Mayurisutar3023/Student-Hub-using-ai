@@ -1,0 +1,2890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Career Hub – OpenRouter</title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js">
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #F8FAFC;
+            color: #1E293B;
+            transition: background 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+        body.dark {
+            background: #0F172A;
+            color: #E2E8F0;
+        }
+        body.dark .card {
+            background: #1E293B;
+            border-color: #334155;
+        }
+        body.dark .sidebar {
+            background: #1E293B;
+            border-color: #334155;
+        }
+        body.dark .sidebar a {
+            color: #94A3B8;
+        }
+        body.dark .sidebar a.active,
+        body.dark .sidebar a:hover {
+            background: #334155;
+            color: #E2E8F0;
+        }
+        body.dark input,
+        body.dark textarea,
+        body.dark select {
+            background: #0F172A;
+            color: #E2E8F0;
+            border-color: #334155;
+        }
+        body.dark input::placeholder,
+        body.dark textarea::placeholder {
+            color: #64748B;
+        }
+        body.dark .text-gray-600 {
+            color: #94A3B8;
+        }
+        body.dark .text-gray-500 {
+            color: #64748B;
+        }
+        body.dark .bg-gray-50 {
+            background: #0F172A;
+        }
+        body.dark .bg-indigo-50 {
+            background: #1E293B;
+        }
+        body.dark .border-gray-200 {
+            border-color: #334155;
+        }
+        body.dark .shadow-sm {
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        body.dark .shadow-md {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        body.dark .shadow-lg {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.10);
+        }
+
+        .sidebar {
+            background: #ffffff;
+            border-right: 1px solid #f1f5f9;
+            transition: transform 0.3s ease;
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            color: #475569;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #EEF2FF;
+            color: #4F46E5;
+        }
+        .sidebar a .icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        .gradient-btn {
+            background: linear-gradient(135deg, #4F46E5, #38BDF8);
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
+        }
+        .gradient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(79, 70, 229, 0.4);
+        }
+        .gradient-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .gradient-btn-sm {
+            padding: 6px 16px;
+            font-size: 0.85rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 420px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-success {
+            background: #10B981;
+            color: #fff;
+        }
+        .toast-error {
+            background: #EF4444;
+            color: #fff;
+        }
+        .toast-info {
+            background: #4F46E5;
+            color: #fff;
+        }
+        .toast-warning {
+            background: #F59E0B;
+            color: #fff;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .toggle-track {
+            width: 48px;
+            height: 26px;
+            background: #cbd5e1;
+            border-radius: 40px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex-shrink: 0;
+            border: none;
+        }
+        body.dark .toggle-track {
+            background: #334155;
+        }
+        .toggle-track.active {
+            background: #4F46E5;
+        }
+        .toggle-thumb {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+        }
+        .toggle-track.active .toggle-thumb {
+            transform: translateX(22px);
+        }
+
+        .badge-pill {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: #EEF2FF;
+            color: #4F46E5;
+        }
+        body.dark .badge-pill {
+            background: #312E81;
+            color: #A5B4FC;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 40;
+        }
+        .sidebar-overlay.open {
+            display: block;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        body.dark ::-webkit-scrollbar-track {
+            background: #1E293B;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4F46E5;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4338CA;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 260px;
+                z-index: 50;
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 3px;
+            color: #475569;
+        }
+        body.dark .input-group label {
+            color: #94A3B8;
+        }
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+            font-size: 0.95rem;
+            transition: border 0.2s;
+            outline: none;
+        }
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: #4F46E5;
+            background: #fff;
+        }
+        body.dark .input-group input,
+        body.dark .input-group textarea,
+        body.dark .input-group select {
+            background: #0F172A;
+            border-color: #334155;
+        }
+        body.dark .input-group input:focus,
+        body.dark .input-group textarea:focus,
+        body.dark .input-group select:focus {
+            border-color: #818CF8;
+            background: #0F172A;
+        }
+
+        .saved-item {
+            cursor: pointer;
+            transition: background 0.2s;
+            padding: 6px;
+            border-radius: 6px;
+        }
+        .saved-item:hover {
+            background: #f1f5f9;
+        }
+        body.dark .saved-item:hover {
+            background: #1E293B;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .portfolio-preview {
+            background: #fff;
+            color: #1E293B;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 100%;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+        }
+        body.dark .portfolio-preview {
+            background: #f8fafc;
+            color: #0F172A;
+        }
+        .portfolio-preview .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #4F46E5;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 10px;
+        }
+        .portfolio-preview .social-link {
+            display: inline-block;
+            margin: 0 6px;
+            color: #4F46E5;
+        }
+        .portfolio-preview .project-card {
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        body.dark .portfolio-preview .project-card {
+            background: #e2e8f0;
+        }
+        .portfolio-preview .skill-badge {
+            display: inline-block;
+            background: #EEF2FF;
+            color: #4F46E5;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 2px 4px 2px 0;
+        }
+
+        .resume-preview {
+            background: #fff;
+            color: #1E293B;
+            padding: 30px;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            max-width: 100%;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        body.dark .resume-preview {
+            background: #f8fafc;
+            color: #0F172A;
+        }
+        .resume-preview h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .resume-preview .subhead {
+            font-size: 1rem;
+            color: #475569;
+            margin-bottom: 12px;
+        }
+        .resume-preview .section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-bottom: 2px solid #4F46E5;
+            padding-bottom: 4px;
+            margin: 16px 0 10px;
+        }
+        .resume-preview .item {
+            margin-bottom: 6px;
+        }
+        .resume-preview .item strong {
+            font-weight: 600;
+        }
+        .resume-preview .skill-badge {
+            display: inline-block;
+            background: #EEF2FF;
+            color: #4F46E5;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin: 2px 4px 2px 0;
+        }
+        .resume-list {
+            list-style: none;
+            padding: 0;
+        }
+        .resume-list li {
+            margin-bottom: 4px;
+        }
+        .resume-list li::before {
+            content: "• ";
+            color: #4F46E5;
+            font-weight: bold;
+        }
+
+        .question-container {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            background: #f8fafc;
+        }
+        body.dark .question-container {
+            background: #0F172A;
+        }
+        .question-container .question-number {
+            font-weight: 600;
+            color: #4F46E5;
+        }
+        .option-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            background: #fff;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+        .option-btn:hover {
+            border-color: #4F46E5;
+            background: #f8fafc;
+        }
+        .option-btn.selected {
+            border-color: #4F46E5;
+            background: #EEF2FF;
+        }
+        .option-btn.correct {
+            border-color: #10B981;
+            background: #D1FAE5;
+        }
+        .option-btn.wrong {
+            border-color: #EF4444;
+            background: #FEE2E2;
+        }
+        body.dark .option-btn {
+            background: #1E293B;
+            border-color: #334155;
+            color: #E2E8F0;
+        }
+        body.dark .option-btn:hover {
+            border-color: #818CF8;
+            background: #0F172A;
+        }
+        body.dark .option-btn.selected {
+            border-color: #818CF8;
+            background: #1E293B;
+        }
+        body.dark .option-btn.correct {
+            border-color: #10B981;
+            background: #065F46;
+        }
+        body.dark .option-btn.wrong {
+            border-color: #EF4444;
+            background: #7F1D1D;
+        }
+        .timer-bar {
+            height: 6px;
+            border-radius: 4px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+        .timer-bar .fill {
+            height: 100%;
+            background: #4F46E5;
+            transition: width 0.5s;
+        }
+        .timer-bar .fill.warning {
+            background: #F59E0B;
+        }
+        .timer-bar .fill.danger {
+            background: #EF4444;
+        }
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        body.dark .leaderboard-entry {
+            border-color: #334155;
+        }
+        .leaderboard-entry .rank {
+            font-weight: 600;
+            color: #4F46E5;
+            min-width: 30px;
+        }
+        .leaderboard-entry .score {
+            font-weight: 600;
+        }
+        .leaderboard-entry .date {
+            font-size: 0.7rem;
+            color: #94A3B8;
+        }
+
+        .file-upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .file-upload-box:hover {
+            border-color: #4F46E5;
+            background: #f8fafc;
+        }
+        body.dark .file-upload-box {
+            border-color: #334155;
+        }
+        body.dark .file-upload-box:hover {
+            border-color: #818CF8;
+            background: #0F172A;
+        }
+
+        .tab-btn {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            font-family: 'Poppins', sans-serif;
+        }
+        .tab-btn.active {
+            background: #4F46E5;
+            color: #fff;
+        }
+        .tab-btn:not(.active):hover {
+            background: #e2e8f0;
+        }
+        body.dark .tab-btn:not(.active):hover {
+            background: #1E293B;
+        }
+
+        .quick-tool {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .quick-tool:hover {
+            background: #EEF2FF;
+            transform: translateY(-4px);
+        }
+        body.dark .quick-tool {
+            background: #0F172A;
+        }
+        body.dark .quick-tool:hover {
+            background: #1E293B;
+        }
+
+        .activity-item {
+            border-left: 3px solid #4F46E5;
+            padding-left: 12px;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .hero-bg .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: floatOrb 20s ease-in-out infinite alternate;
+        }
+        .hero-bg .orb:nth-child(1) {
+            width: 600px;
+            height: 600px;
+            background: #4F46E5;
+            top: -10%;
+            left: -10%;
+            animation-duration: 22s;
+        }
+        .hero-bg .orb:nth-child(2) {
+            width: 500px;
+            height: 500px;
+            background: #38BDF8;
+            bottom: -10%;
+            right: -10%;
+            animation-duration: 26s;
+            animation-delay: 2s;
+        }
+        .hero-bg .orb:nth-child(3) {
+            width: 350px;
+            height: 350px;
+            background: #10B981;
+            top: 40%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-duration: 30s;
+            animation-delay: 4s;
+        }
+        @keyframes floatOrb {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(60px, -40px) scale(1.05);
+            }
+            66% {
+                transform: translate(-30px, 50px) scale(0.95);
+            }
+            100% {
+                transform: translate(20px, -20px) scale(1.02);
+            }
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        body.dark .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #4F46E5 0%, #38BDF8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4F46E5, #38BDF8);
+            color: #fff;
+            padding: 12px 32px;
+            border-radius: 60px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(79, 70, 229, 0.45);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #1E293B;
+            padding: 12px 32px;
+            border-radius: 60px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 1px solid #E2E8F0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        body.dark .btn-secondary {
+            background: #1E293B;
+            color: #F1F5F9;
+            border-color: #334155;
+        }
+        .btn-secondary:hover {
+            background: #fff;
+            border-color: #4F46E5;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+        body.dark .btn-secondary:hover {
+            border-color: #4F46E5;
+        }
+
+        .float-card {
+            animation: floatCard 6s ease-in-out infinite alternate;
+        }
+        .float-card:nth-child(2) {
+            animation-delay: 1.5s;
+        }
+        .float-card:nth-child(3) {
+            animation-delay: 3s;
+        }
+        @keyframes floatCard {
+            0% {
+                transform: translateY(0px);
+            }
+            100% {
+                transform: translateY(-18px);
+            }
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+        .feature-card:hover .feature-icon {
+            transform: scale(1.08) rotate(-3deg);
+        }
+        .card-premium {
+            background: #fff;
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s;
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+        .card-premium:hover {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
+        }
+        body.dark .card-premium {
+            background: #1E293B;
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .roadmap-section {
+            margin-bottom: 16px;
+        }
+        .roadmap-section h3 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            color: #4F46E5;
+        }
+        body.dark .roadmap-section h3 {
+            color: #818CF8;
+        }
+        .roadmap-section ul {
+            list-style: disc;
+            padding-left: 20px;
+        }
+        .roadmap-section ul li {
+            margin-bottom: 4px;
+        }
+        .roadmap-timeline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .roadmap-timeline .phase {
+            flex: 1;
+            min-width: 120px;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        body.dark .roadmap-timeline .phase {
+            background: #0F172A;
+        }
+        .roadmap-timeline .phase .time {
+            font-weight: 600;
+            color: #4F46E5;
+        }
+        .roadmap-timeline .phase .desc {
+            font-size: 0.85rem;
+        }
+        .result-section {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        body.dark .result-section {
+            background: #0F172A;
+        }
+        .result-section h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .form-section {
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+        body.dark .form-section {
+            border-color: #334155;
+        }
+        .resume-actions,
+        .portfolio-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .resume-actions button,
+        .portfolio-actions button {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .api-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .api-status.valid {
+            background: #10B981;
+        }
+        .api-status.invalid {
+            background: #EF4444;
+        }
+        .api-status.unknown {
+            background: #F59E0B;
+        }
+
+        .api-key-hint {
+            background: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        body.dark .api-key-hint {
+            background: #1E293B;
+            border-left-color: #F59E0B;
+        }
+        .api-key-hint code {
+            background: #FDE68A;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        body.dark .api-key-hint code {
+            background: #334155;
+            color: #FCD34D;
+        }
+
+        .provider-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .provider-badge.openrouter {
+            background: #6C3BDB;
+            color: #fff;
+        }
+        .provider-badge.mock {
+            background: #F59E0B;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast"></div>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 p-4 flex flex-col z-50">
+        <div class="flex items-center gap-2 text-xl font-bold text-indigo-600 dark:text-indigo-400 mb-6">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            AI Career Hub
+        </div>
+        <nav class="flex-1 space-y-1" id="mainNav">
+            <a data-page="landing"><span class="icon">🏠</span> Home</a>
+            <a data-page="dashboard" class="active"><span class="icon">📊</span> Dashboard</a>
+            <a data-page="profile"><span class="icon">👤</span> Profile</a>
+            <a data-page="resume"><span class="icon">📄</span> Resume Builder</a>
+            <a data-page="portfolio"><span class="icon">🌐</span> Portfolio</a>
+            <a data-page="notes"><span class="icon">📝</span> Notes Summarizer</a>
+            <a data-page="quiz"><span class="icon">🧠</span> Quiz Generator</a>
+            <a data-page="flashcards"><span class="icon">🃏</span> Flashcards</a>
+            <a data-page="roadmap"><span class="icon">🗺️</span> Career Roadmap</a>
+            <a data-page="coverletter"><span class="icon">✉️</span> Cover Letter</a>
+            <a data-page="studyplanner"><span class="icon">📅</span> Study Planner</a>
+            <a data-page="saved"><span class="icon">💾</span> Saved Files</a>
+            <a data-page="settings"><span class="icon">⚙️</span> Settings</a>
+        </nav>
+        <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button id="logoutBtn" class="flex items-center gap-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 w-full p-2 rounded-lg transition">
+                <span class="icon">🚪</span> Logout
+            </button>
+            <div class="mt-2 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                <span>Dark Mode</span>
+                <button id="darkToggleSidebar" class="toggle-track" aria-label="Toggle dark mode">
+                    <div class="toggle-thumb"></div>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <div class="ml-0 md:ml-64 p-4 md:p-6 transition-all" id="mainContent">
+
+        <header class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <button id="menuToggle" class="md:hidden p-2 rounded-lg hover:bg-gray-200/60 dark:hover:bg-gray-700/60 transition" onclick="toggleSidebar()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
+                <h1 class="text-2xl font-bold" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="userGreeting" class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden sm:inline">Welcome, User</span>
+                <div class="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 flex items-center justify-center font-semibold text-sm ring-2 ring-indigo-200 dark:ring-indigo-800/50">
+                    <span id="userAvatar">U</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- LANDING -->
+        <div id="page-landing" class="page">
+            <section class="relative min-h-[80vh] flex items-center overflow-hidden">
+                <div class="hero-bg">
+                    <div class="orb"></div>
+                    <div class="orb"></div>
+                    <div class="orb"></div>
+                </div>
+                <div class="relative z-10 max-w-7xl mx-auto px-4 py-12">
+                    <div class="grid lg:grid-cols-2 gap-16 items-center">
+                        <div class="space-y-8">
+                            <span class="inline-flex items-center gap-2 bg-[#4F46E5]/10 text-[#4F46E5] text-sm font-semibold px-4 py-2 rounded-full">✨ AI-Powered Career Platform</span>
+                            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1]">Build Your <br /><span class="gradient-text">AI-Powered</span> <br />Career Future</h1>
+                            <p class="text-lg text-gray-600 max-w-lg leading-relaxed">Generate resumes, portfolios, quizzes, roadmaps, and more — powered by <strong>OpenRouter</strong> (supports Gemini, Llama, GPT‑4o‑mini, and more).</p>
+                            <div class="flex flex-wrap gap-4">
+                                <button onclick="navigateTo('dashboard')" class="btn-primary text-base">🚀 Get Started</button>
+                                <button onclick="navigateTo('dashboard')" class="btn-secondary text-base">▶ Explore</button>
+                            </div>
+                            <div class="flex items-center gap-6 text-sm text-gray-500">
+                                <span>✓ No credit card</span>
+                                <span>✓ Free forever</span>
+                                <span>✓ 50+ AI tools</span>
+                            </div>
+                        </div>
+                        <div class="relative grid grid-cols-2 gap-4">
+                            <div class="float-card card-premium col-span-2 sm:col-span-1 text-center"><div class="w-14 h-14 rounded-2xl bg-[#4F46E5]/10 text-[#4F46E5] flex items-center justify-center text-2xl mx-auto mb-3">📄</div><h4 class="font-bold">AI Resume</h4><p class="text-sm text-gray-500">ATS-friendly</p></div>
+                            <div class="float-card card-premium col-span-2 sm:col-span-1 text-center" style="animation-delay:0.8s"><div class="w-14 h-14 rounded-2xl bg-[#38BDF8]/10 text-[#38BDF8] flex items-center justify-center text-2xl mx-auto mb-3">🌐</div><h4 class="font-bold">Portfolio</h4><p class="text-sm text-gray-500">Stunning sites</p></div>
+                            <div class="float-card card-premium col-span-2 sm:col-span-1 text-center" style="animation-delay:1.6s"><div class="w-14 h-14 rounded-2xl bg-[#10B981]/10 text-[#10B981] flex items-center justify-center text-2xl mx-auto mb-3">🧠</div><h4 class="font-bold">Quiz & Flashcards</h4><p class="text-sm text-gray-500">Smart study</p></div>
+                            <div class="float-card card-premium col-span-2 sm:col-span-1 text-center" style="animation-delay:2.4s"><div class="w-14 h-14 rounded-2xl bg-[#F59E0B]/10 text-[#F59E0B] flex items-center justify-center text-2xl mx-auto mb-3">🗺️</div><h4 class="font-bold">Career Roadmap</h4><p class="text-sm text-gray-500">Personalized paths</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="py-16"><div class="max-w-7xl mx-auto px-4"><div class="glass rounded-3xl p-8 grid grid-cols-2 md:grid-cols-4 gap-8 text-center border border-white/30"><div><div class="text-3xl font-extrabold gradient-text">50K+</div><div class="text-sm text-gray-500">Active Students</div></div><div><div class="text-3xl font-extrabold gradient-text">120K+</div><div class="text-sm text-gray-500">Resumes Generated</div></div><div><div class="text-3xl font-extrabold gradient-text">98%</div><div class="text-sm text-gray-500">Satisfaction Rate</div></div><div><div class="text-3xl font-extrabold gradient-text">4.9★</div><div class="text-sm text-gray-500">User Rating</div></div></div></div></section>
+            <section class="py-16"><div class="max-w-7xl mx-auto px-4"><div class="text-center max-w-2xl mx-auto mb-12"><span class="text-[#4F46E5] font-semibold text-sm tracking-wider uppercase">Features</span><h2 class="text-4xl font-extrabold mt-2">Everything You Need to <span class="gradient-text">Succeed</span></h2></div><div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card card-premium group"><div class="feature-icon bg-[#4F46E5]/10 text-[#4F46E5] group-hover:bg-[#4F46E5] group-hover:text-white transition">📄</div><h4 class="font-bold text-lg mt-4">AI Resume Builder</h4><p class="text-gray-500 text-sm mt-2">Generate ATS-friendly resumes with AI.</p></div>
+                <div class="feature-card card-premium group"><div class="feature-icon bg-[#38BDF8]/10 text-[#38BDF8] group-hover:bg-[#38BDF8] group-hover:text-white transition">🌐</div><h4 class="font-bold text-lg mt-4">Portfolio Generator</h4><p class="text-gray-500 text-sm mt-2">Create stunning portfolio websites.</p></div>
+                <div class="feature-card card-premium group"><div class="feature-icon bg-[#10B981]/10 text-[#10B981] group-hover:bg-[#10B981] group-hover:text-white transition">📝</div><h4 class="font-bold text-lg mt-4">Notes Summarizer</h4><p class="text-gray-500 text-sm mt-2">Get instant AI summaries of your notes.</p></div>
+                <div class="feature-card card-premium group"><div class="feature-icon bg-[#F59E0B]/10 text-[#F59E0B] group-hover:bg-[#F59E0B] group-hover:text-white transition">🧠</div><h4 class="font-bold text-lg mt-4">Quiz & Flashcards</h4><p class="text-gray-500 text-sm mt-2">Generate MCQs, True/False, and flashcards.</p></div>
+                <div class="feature-card card-premium group"><div class="feature-icon bg-[#EC4899]/10 text-[#EC4899] group-hover:bg-[#EC4899] group-hover:text-white transition">🗺️</div><h4 class="font-bold text-lg mt-4">Career Roadmap</h4><p class="text-gray-500 text-sm mt-2">Personalized career roadmaps.</p></div>
+                <div class="feature-card card-premium group"><div class="feature-icon bg-[#8B5CF6]/10 text-[#8B5CF6] group-hover:bg-[#8B5CF6] group-hover:text-white transition">📅</div><h4 class="font-bold text-lg mt-4">Study Planner</h4><p class="text-gray-500 text-sm mt-2">Daily, weekly, and monthly planners.</p></div>
+            </div></div></section>
+            <section class="py-16 bg-gradient-to-br from-[#4F46E5] to-[#38BDF8] relative overflow-hidden rounded-2xl my-8"><div class="relative z-10 max-w-4xl mx-auto px-4 text-center text-white"><h2 class="text-4xl sm:text-5xl font-extrabold">Ready to Build Your Career?</h2><p class="text-lg text-white/80 mt-4 max-w-2xl mx-auto">Join 50,000+ students already using AI Student Career Hub.</p><div class="flex flex-wrap justify-center gap-4 mt-8"><button onclick="navigateTo('dashboard')" class="bg-white text-[#4F46E5] font-bold px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transition hover:scale-105 flex items-center gap-3">🚀 Start Building Now</button></div></div></section>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="page-dashboard" class="page active">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="card p-4 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-2xl">📄</div><div><div class="text-sm text-gray-500 dark:text-gray-400">Resumes</div><div class="text-2xl font-bold" id="dashResumeCount">0</div></div></div>
+                <div class="card p-4 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-2xl">🧠</div><div><div class="text-sm text-gray-500 dark:text-gray-400">Quizzes Taken</div><div class="text-2xl font-bold" id="dashQuizCount">0</div></div></div>
+                <div class="card p-4 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-2xl">📝</div><div><div class="text-sm text-gray-500 dark:text-gray-400">Notes Summaries</div><div class="text-2xl font-bold" id="dashNotesCount">0</div></div></div>
+                <div class="card p-4 flex items-center gap-4"><div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-2xl">⭐</div><div><div class="text-sm text-gray-500 dark:text-gray-400">Profile Completeness</div><div class="text-2xl font-bold" id="dashProfileComplete">65%</div></div></div>
+            </div>
+            <div class="mb-6"><h2 class="text-lg font-bold mb-3">⚡ Quick AI Tools</h2><div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <div class="quick-tool" onclick="navigateTo('resume')">📄<br><span class="text-sm font-medium">Resume</span></div>
+                <div class="quick-tool" onclick="navigateTo('portfolio')">🌐<br><span class="text-sm font-medium">Portfolio</span></div>
+                <div class="quick-tool" onclick="navigateTo('notes')">📝<br><span class="text-sm font-medium">Summarize</span></div>
+                <div class="quick-tool" onclick="navigateTo('quiz')">🧠<br><span class="text-sm font-medium">Quiz</span></div>
+                <div class="quick-tool" onclick="navigateTo('roadmap')">🗺️<br><span class="text-sm font-medium">Roadmap</span></div>
+                <div class="quick-tool" onclick="navigateTo('studyplanner')">📅<br><span class="text-sm font-medium">Planner</span></div>
+            </div></div>
+            <div class="card p-4 mb-6"><h3 class="font-semibold mb-2">📅 Upcoming Tasks</h3><ul class="space-y-3" id="taskList"><li class="flex items-center gap-3"><input type="checkbox" class="rounded border-gray-300" /><span class="text-sm">Complete resume</span><span class="ml-auto text-xs text-gray-400">Today</span></li><li class="flex items-center gap-3"><input type="checkbox" class="rounded border-gray-300" /><span class="text-sm">Study for AI quiz</span><span class="ml-auto text-xs text-gray-400">Tomorrow</span></li><li class="flex items-center gap-3"><input type="checkbox" class="rounded border-gray-300" /><span class="text-sm">Generate portfolio</span><span class="ml-auto text-xs text-gray-400">Wed</span></li></ul><button class="mt-3 text-sm text-indigo-600 dark:text-indigo-400 hover:underline" id="addTaskBtn">+ Add task</button></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card p-4"><h3 class="font-semibold mb-3">🕒 Recent Activity</h3><div class="space-y-3" id="activityFeed"><div class="activity-item text-sm"><div class="font-medium">Generated resume</div><div class="text-xs text-gray-500">2 hours ago</div></div><div class="activity-item text-sm"><div class="font-medium">Completed quiz: AI Basics</div><div class="text-xs text-gray-500">Yesterday</div></div><div class="activity-item text-sm"><div class="font-medium">Saved portfolio draft</div><div class="text-xs text-gray-500">2 days ago</div></div></div></div>
+                <div class="card p-4"><h3 class="font-semibold mb-3">📚 Study Progress</h3><div class="space-y-3"><div><div class="flex justify-between text-sm"><span>AI Engineer Roadmap</span><span>45%</span></div><div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full"><div class="h-2 bg-indigo-500 rounded-full" style="width:45%"></div></div></div><div><div class="flex justify-between text-sm"><span>Data Science Prep</span><span>70%</span></div><div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full"><div class="h-2 bg-emerald-500 rounded-full" style="width:70%"></div></div></div><div><div class="flex justify-between text-sm"><span>Frontend Development</span><span>25%</span></div><div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full"><div class="h-2 bg-cyan-500 rounded-full" style="width:25%"></div></div></div></div><div class="mt-4 p-3 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg flex justify-between items-center"><span class="text-sm">🔥 Weekly study streak: 4 days</span><span class="text-xs text-indigo-600 dark:text-indigo-400 font-medium">+2 this week</span></div></div>
+            </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div id="page-profile" class="page">
+            <div class="card p-6 max-w-2xl mx-auto">
+                <h2 class="text-xl font-bold mb-4">👤 Your Profile</h2>
+                <div class="input-group"><label>Display Name</label><input type="text" id="profileName" placeholder="Your name" /></div>
+                <div class="input-group"><label>Email</label><input type="email" id="profileEmail" placeholder="your@email.com" /></div>
+                <div class="input-group"><label>Bio</label><textarea id="profileBio" rows="3" placeholder="Tell us about yourself..."></textarea></div>
+                <div class="input-group"><label>Skills (comma separated)</label><input type="text" id="profileSkills" placeholder="JavaScript, Python, React" /></div>
+                <div class="input-group"><label>Education</label><input type="text" id="profileEducation" placeholder="B.Sc. Computer Science, University" /></div>
+                <button class="gradient-btn" id="saveProfileBtn">💾 Save Profile</button>
+                <div id="profileStatus" class="mt-2 text-sm text-gray-500 dark:text-gray-400"></div>
+            </div>
+        </div>
+
+        <!-- RESUME -->
+        <div id="page-resume" class="page">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-3 card p-4">
+                    <div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">✏️ Edit Resume</h2><button class="gradient-btn gradient-btn-sm" id="resumeNewBtn">+ New</button></div>
+                    <div id="resumeListContainer" class="mb-4 p-2 bg-gray-50 dark:bg-gray-800/30 rounded-lg"><div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"><span>Load saved:</span><select id="resumeSelector" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm flex-1"><option value="">-- Select a resume --</option></select><button id="resumeDeleteBtn" class="text-red-600 hover:text-red-800 text-sm px-2">🗑️</button></div></div>
+                    <form id="resumeForm"><input type="hidden" id="resumeId" value="" /><div class="input-group"><label>Full Name</label><input type="text" id="resumeFullName" placeholder="John Doe" required /></div><div class="input-group"><label>Education</label><input type="text" id="resumeEducation" placeholder="B.Sc. Computer Science, University of XYZ, 2024" /></div><div class="input-group"><label>Skills (comma separated)</label><input type="text" id="resumeSkills" placeholder="JavaScript, Python, React, Node.js" /></div><div class="input-group"><label>Experience</label><textarea id="resumeExperience" rows="3" placeholder="Software Engineer at ABC Corp (2022-2024) ..."></textarea></div><div class="input-group"><label>Projects (comma separated)</label><input type="text" id="resumeProjects" placeholder="E-commerce platform, Chatbot, Portfolio website" /></div><div class="input-group"><label>Achievements (comma separated)</label><input type="text" id="resumeAchievements" placeholder="Hackathon winner, Published paper" /></div><div class="input-group"><label>Languages (comma separated)</label><input type="text" id="resumeLanguages" placeholder="English (fluent), Spanish (intermediate)" /></div><div class="resume-actions"><button type="submit" class="gradient-btn gradient-btn-sm" id="resumeSaveBtn">💾 Save</button><button type="button" class="gradient-btn gradient-btn-sm bg-emerald-500 hover:bg-emerald-600" id="resumeAiBtn">✨ AI Enhance</button><button type="button" class="gradient-btn gradient-btn-sm bg-cyan-500 hover:bg-cyan-600" id="resumePdfBtn">📥 Download PDF</button></div><div id="resumeAiStatus" class="mt-2 text-sm text-gray-500 dark:text-gray-400 italic"></div></form>
+                </div>
+                <div class="lg:col-span-2"><div class="card p-4 sticky top-4"><h2 class="text-lg font-bold mb-3">👁️ Live Preview</h2><div id="resumePreview" class="resume-preview"><div class="text-center text-gray-400 dark:text-gray-500">Fill in the form</div></div></div></div>
+            </div>
+        </div>
+
+        <!-- PORTFOLIO -->
+        <div id="page-portfolio" class="page">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-3 card p-4">
+                    <div class="flex justify-between items-center mb-4"><h2 class="text-lg font-bold">✏️ Edit Portfolio</h2><button class="gradient-btn gradient-btn-sm" id="portfolioNewBtn">+ New</button></div>
+                    <div id="portfolioListContainer" class="mb-4 p-2 bg-gray-50 dark:bg-gray-800/30 rounded-lg"><div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"><span>Load saved:</span><select id="portfolioSelector" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm flex-1"><option value="">-- Select a portfolio --</option></select><button id="portfolioDeleteBtn" class="text-red-600 hover:text-red-800 text-sm px-2">🗑️</button></div></div>
+                    <form id="portfolioForm"><input type="hidden" id="portfolioId" value="" /><div class="input-group"><label>Full Name</label><input type="text" id="portfolioFullName" placeholder="Jane Doe" required /></div><div class="input-group"><label>Professional Title</label><input type="text" id="portfolioTitle" placeholder="Full Stack Developer" /></div><div class="input-group"><label>Bio / About</label><textarea id="portfolioBio" rows="2" placeholder="I'm a passionate developer..."></textarea></div><div class="input-group"><label>Email</label><input type="email" id="portfolioEmail" placeholder="jane@example.com" /></div><div class="input-group"><label>Social Links (JSON)</label><input type="text" id="portfolioSocial" placeholder='{"github":"https://github.com/...","linkedin":"https://linkedin.com/..."}' /></div><div class="input-group"><label>Skills (comma separated)</label><input type="text" id="portfolioSkills" placeholder="JavaScript, React, Python" /></div><div class="input-group"><label>Projects (JSON array)</label><textarea id="portfolioProjects" rows="3" placeholder='[{"title":"E-commerce","description":"Full stack web app","link":"https://..."}]'></textarea></div><div class="portfolio-actions"><button type="submit" class="gradient-btn gradient-btn-sm" id="portfolioSaveBtn">💾 Save</button><button type="button" class="gradient-btn gradient-btn-sm bg-emerald-500 hover:bg-emerald-600" id="portfolioAiBtn">✨ AI Enhance</button><button type="button" class="gradient-btn gradient-btn-sm bg-cyan-500 hover:bg-cyan-600" id="portfolioZipBtn">📦 Download ZIP</button><button type="button" class="gradient-btn gradient-btn-sm bg-purple-500 hover:bg-purple-600" id="portfolioPublishBtn">🚀 Publish</button></div><div id="portfolioAiStatus" class="mt-2 text-sm text-gray-500 dark:text-gray-400 italic"></div></form>
+                </div>
+                <div class="lg:col-span-2"><div class="card p-4 sticky top-4"><h2 class="text-lg font-bold mb-3">👁️ Live Preview</h2><div id="portfolioPreview" class="portfolio-preview"><div class="text-center text-gray-400 dark:text-gray-500">Fill in the form</div></div></div></div>
+            </div>
+        </div>
+
+        <!-- NOTES -->
+        <div id="page-notes" class="page">
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-3 space-y-4">
+                    <div class="card p-4"><h2 class="text-lg font-bold mb-3">📤 Input</h2><div class="flex gap-2 mb-3"><button class="tab-btn active" data-notes-tab="paste">Paste Text</button><button class="tab-btn" data-notes-tab="file">Upload File</button></div><div id="notesPasteTab" class="input-group"><label for="notesTextInput">Paste your notes here</label><textarea id="notesTextInput" rows="6" placeholder="Paste your lecture notes..."></textarea></div><div id="notesFileTab" class="hidden"><div class="file-upload-box" id="notesDropZone"><input type="file" id="notesFileInput" accept=".txt,.pdf,.docx" class="hidden" /><div class="text-gray-500 dark:text-gray-400"><span class="text-3xl">📁</span><br />Drag & drop or click to upload<br /><span class="text-xs">Supports: PDF, DOCX, TXT</span></div><div id="notesFileName" class="mt-2 text-sm text-indigo-600 dark:text-indigo-400 hidden"></div></div></div><button class="gradient-btn w-full mt-2" id="notesSummarizeBtn"><span id="notesSummarizeText">🧠 Summarize</span><span id="notesSummarizeSpinner" class="hidden"><span class="spinner"></span></span></button><div id="notesStatus" class="mt-2 text-sm text-gray-500 dark:text-gray-400 italic"></div></div>
+                    <div class="card p-4"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-bold">📋 Results</h2><button class="gradient-btn gradient-btn-sm" id="notesDownloadBtn">⬇️ Download</button></div><div id="notesResultContainer"><div class="text-center text-gray-400 dark:text-gray-500 py-8">Summary will appear here</div></div></div>
+                </div>
+                <div class="lg:col-span-2"><div class="card p-4"><h2 class="text-lg font-bold mb-3">💾 Saved History</h2><div id="notesHistoryList" class="space-y-2 max-h-96 overflow-y-auto"><div class="text-gray-400 dark:text-gray-500 text-sm">No saved summaries yet</div></div><button id="notesClearHistoryBtn" class="text-sm text-red-600 dark:text-red-400 hover:underline mt-2">Clear all</button></div></div>
+            </div>
+        </div>
+
+        <!-- QUIZ -->
+        <div id="page-quiz" class="page">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="card p-4"><h2 class="text-lg font-bold mb-3">📝 Generate Quiz</h2><form id="quizForm"><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><div class="input-group"><label>Topic</label><input type="text" id="quizTopic" placeholder="e.g., Machine Learning" required /></div><div class="input-group"><label>Number of Questions</label><select id="quizNumQuestions"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option></select></div><div class="input-group"><label>Difficulty</label><select id="quizDifficulty"><option value="easy">Easy</option><option value="medium" selected>Medium</option><option value="hard">Hard</option><option value="mixed">Mixed</option></select></div><div class="input-group"><label>Question Types</label><select id="quizTypes"><option value="mixed">Mixed</option><option value="mcq" selected>MCQ</option><option value="truefalse">True/False</option><option value="short">Short Answer</option></select></div></div><button type="submit" class="gradient-btn w-full mt-2"><span id="quizGenerateText">🚀 Generate Quiz</span><span id="quizGenerateSpinner" class="hidden"><span class="spinner"></span></span></button></form><div id="quizGenStatus" class="mt-2 text-sm text-gray-500 dark:text-gray-400 italic"></div></div>
+                    <div id="quizContainer" class="card p-4 hidden"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-bold" id="quizTitle">Quiz</h2><div class="flex items-center gap-4"><span class="text-sm font-medium" id="quizTimer">⏱️ 0:00</span><span class="text-sm font-medium" id="quizScore">⭐ 0/0</span><button class="gradient-btn gradient-btn-sm" id="quizSubmitBtn">📤 Submit</button></div></div><div class="timer-bar mb-4"><div class="fill" id="quizTimerFill" style="width:100%"></div></div><div id="quizQuestionsContainer"></div></div>
+                    <div id="quizResultsContainer" class="card p-4 hidden"><h2 class="text-lg font-bold mb-2">📊 Results</h2><div id="quizResultsContent"></div><button class="gradient-btn gradient-btn-sm mt-3" id="quizRetryBtn">🔄 Retry</button></div>
+                </div>
+                <div class="space-y-4"><div class="card p-4"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-bold">📚 History</h2><button id="quizClearHistoryBtn" class="text-sm text-red-600 dark:text-red-400 hover:underline">Clear</button></div><div id="quizHistoryList" class="space-y-2 max-h-64 overflow-y-auto"><div class="text-gray-400 dark:text-gray-500 text-sm">No quiz history</div></div></div><div class="card p-4"><h2 class="text-lg font-bold mb-3">🏆 Leaderboard</h2><div id="quizLeaderboard" class="space-y-1 max-h-64 overflow-y-auto"><div class="text-gray-400 dark:text-gray-500 text-sm">No scores yet</div></div></div></div>
+            </div>
+        </div>
+
+        <!-- ROADMAP -->
+        <div id="page-roadmap" class="page">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="card p-4"><h2 class="text-lg font-bold mb-3">🎯 Generate Roadmap</h2><form id="roadmapForm"><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><div class="input-group"><label>Career Path</label><select id="roadmapCareer" required><option value="">Select a career</option><option value="AI Engineer">AI Engineer</option><option value="Software Developer">Software Developer</option><option value="Data Scientist">Data Scientist</option><option value="UI/UX Designer">UI/UX Designer</option><option value="Cloud Engineer">Cloud Engineer</option><option value="Cyber Security">Cyber Security</option><option value="Frontend Developer">Frontend Developer</option><option value="Backend Developer">Backend Developer</option><option value="DevOps Engineer">DevOps Engineer</option><option value="Mobile Developer">Mobile Developer</option></select></div><div class="input-group"><label>Timeline</label><select id="roadmapTimeline"><option value="6 months">6 months</option><option value="1 year" selected>1 year</option><option value="2 years">2 years</option><option value="3 years">3 years</option></select></div></div><button type="submit" class="gradient-btn w-full mt-2"><span id="roadmapGenerateText">🚀 Generate Roadmap</span><span id="roadmapGenerateSpinner" class="hidden"><span class="spinner"></span></span></button></form><div id="roadmapStatus" class="mt-2 text-sm text-gray-500 dark:text-gray-400 italic"></div></div>
+                    <div id="roadmapContainer" class="card p-4 hidden"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-bold" id="roadmapTitle">Roadmap</h2><button class="gradient-btn gradient-btn-sm" id="roadmapDownloadBtn">📥 Download</button></div><div id="roadmapContent" class="space-y-4 max-h-96 overflow-y-auto"></div></div>
+                </div>
+                <div class="space-y-4"><div class="card p-4"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-bold">📚 History</h2><button id="roadmapClearHistoryBtn" class="text-sm text-red-600 dark:text-red-400 hover:underline">Clear</button></div><div id="roadmapHistoryList" class="space-y-2 max-h-96 overflow-y-auto"><div class="text-gray-400 dark:text-gray-500 text-sm">No roadmaps yet</div></div></div></div>
+            </div>
+        </div>
+
+        <!-- FLASHCARDS -->
+        <div id="page-flashcards" class="page">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 card p-4"><h2 class="text-lg font-bold mb-3">🃏 Flashcard Builder</h2><div class="input-group"><label>Topic</label><input type="text" id="flashcardTopic" placeholder="e.g., AI Fundamentals" /></div><div class="input-group"><label>Front (Term)</label><input type="text" id="flashcardFront" placeholder="What is Machine Learning?" /></div><div class="input-group"><label>Back (Definition)</label><textarea id="flashcardBack" rows="2" placeholder="Machine Learning is a subset of AI..."></textarea></div><button class="gradient-btn gradient-btn-sm" id="flashcardAddBtn">➕ Add Card</button><div class="mt-4"><h3 class="font-semibold mb-2">Your Cards (<span id="flashcardCount">0</span>)</h3><div id="flashcardList" class="space-y-2 max-h-64 overflow-y-auto"></div></div><div class="flex gap-2 mt-4"><button class="gradient-btn gradient-btn-sm bg-emerald-500 hover:bg-emerald-600" id="flashcardStudyBtn">📖 Study</button><button class="gradient-btn gradient-btn-sm bg-cyan-500 hover:bg-cyan-600" id="flashcardExportBtn">📥 Export</button><button class="gradient-btn gradient-btn-sm bg-red-500 hover:bg-red-600" id="flashcardClearBtn">🗑️ Clear All</button></div></div>
+                <div class="card p-4"><h2 class="text-lg font-bold mb-3">📊 Stats</h2><div id="flashcardStats" class="text-sm text-gray-500 dark:text-gray-400">Total cards: 0</div><div class="mt-4 p-4 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg text-center"><div class="text-2xl" id="flashcardStudyDisplay">🃏</div><div class="text-sm mt-1">Click "Study" to review your cards</div></div></div>
+            </div>
+        </div>
+
+        <!-- COVER LETTER -->
+        <div id="page-coverletter" class="page">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card p-4"><h2 class="text-lg font-bold mb-3">✉️ Cover Letter Generator</h2><div class="input-group"><label>Your Name</label><input type="text" id="clName" placeholder="John Doe" /></div><div class="input-group"><label>Your Email</label><input type="email" id="clEmail" placeholder="john@example.com" /></div><div class="input-group"><label>Company Name</label><input type="text" id="clCompany" placeholder="ABC Corp" /></div><div class="input-group"><label>Position</label><input type="text" id="clPosition" placeholder="Software Engineer" /></div><div class="input-group"><label>Why you're a great fit</label><textarea id="clReason" rows="4" placeholder="I am passionate about..."></textarea></div><button class="gradient-btn w-full" id="clGenerateBtn">✉️ Generate Cover Letter</button><div id="clStatus" class="mt-2 text-sm text-gray-500 dark:text-gray-400 italic"></div></div>
+                <div class="card p-4"><div class="flex justify-between items-center mb-3"><h2 class="text-lg font-bold">📄 Preview</h2><button class="gradient-btn gradient-btn-sm" id="clDownloadBtn">⬇️ Download</button></div><div id="clPreview" class="prose max-w-none p-4 bg-gray-50 dark:bg-gray-800/30 rounded-lg whitespace-pre-wrap text-sm">Your cover letter will appear here...</div></div>
+            </div>
+        </div>
+
+        <!-- STUDY PLANNER -->
+        <div id="page-studyplanner" class="page">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 card p-4"><h2 class="text-lg font-bold mb-3">📅 Study Planner</h2><div class="grid grid-cols-2 gap-3"><div class="input-group"><label>Task</label><input type="text" id="spTask" placeholder="Study Chapter 5" /></div><div class="input-group"><label>Date</label><input type="date" id="spDate" /></div></div><div class="flex gap-2"><div class="input-group flex-1"><label>Priority</label><select id="spPriority"><option value="High">High</option><option value="Medium" selected>Medium</option><option value="Low">Low</option></select></div><div class="input-group flex-1"><label>Status</label><select id="spStatus"><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Done">Done</option></select></div></div><button class="gradient-btn gradient-btn-sm" id="spAddBtn">➕ Add Task</button><div class="mt-4"><h3 class="font-semibold mb-2">Your Tasks</h3><div id="spTaskList" class="space-y-2 max-h-64 overflow-y-auto"></div></div><div class="flex gap-2 mt-4"><button class="gradient-btn gradient-btn-sm bg-emerald-500 hover:bg-emerald-600" id="spExportBtn">📥 Export</button><button class="gradient-btn gradient-btn-sm bg-red-500 hover:bg-red-600" id="spClearBtn">🗑️ Clear All</button></div></div>
+                <div class="card p-4"><h2 class="text-lg font-bold mb-3">📊 Progress</h2><div id="spStats" class="text-sm text-gray-500 dark:text-gray-400">Total: 0 | Done: 0</div><div class="mt-4 w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"><div id="spProgressBar" class="h-full bg-indigo-500 rounded-full" style="width:0%"></div></div><div class="mt-4 p-4 bg-indigo-50 dark:bg-indigo-950/20 rounded-lg text-center"><div class="text-sm">📈 Study Streak</div><div class="text-2xl font-bold gradient-text" id="spStreak">0 days</div></div></div>
+            </div>
+        </div>
+
+        <!-- SAVED -->
+        <div id="page-saved" class="page">
+            <div class="card p-6"><h2 class="text-lg font-bold mb-4">💾 Saved Files</h2><div id="savedFilesList" class="space-y-2"><div class="text-gray-400 dark:text-gray-500 text-sm">No saved files yet.</div></div><button class="gradient-btn gradient-btn-sm mt-4" id="savedClearBtn">🗑️ Clear All</button></div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div id="page-settings" class="page">
+            <div class="card p-6 max-w-2xl mx-auto">
+                <h2 class="text-lg font-bold mb-4">⚙️ Settings</h2>
+
+                <!-- AI Provider -->
+                <div class="form-section">
+                    <h3 class="font-semibold mb-2">🤖 AI Provider</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <button class="provider-btn px-3 py-2 rounded-lg border-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 text-sm font-medium" data-provider="openrouter">🟣 OpenRouter (Active)</button>
+                        <button class="provider-btn px-3 py-2 rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-indigo-500 transition text-sm font-medium" data-provider="mock">🔄 Mock (No Key)</button>
+                    </div>
+                    <div id="providerInfo" class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        <span class="provider-badge openrouter">OpenRouter</span> Using model: <strong>google/gemini-2.0-flash-exp:free</strong> (free tier)
+                    </div>
+                </div>
+
+                <!-- API Key (now empty by default – user can paste their own) -->
+                <div class="form-section">
+                    <h3 class="font-semibold mb-2">🔑 API Key</h3>
+                    <div class="api-key-hint">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
+                            💡 Paste your own OpenRouter key here (or use Mock mode with no key).<br>
+                            Get a free key at <a href="https://openrouter.ai/keys" target="_blank" class="text-indigo-600 dark:text-indigo-400 underline">openrouter.ai/keys</a>
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="password" id="apiKeyInput" value="" placeholder="sk-or-v1-..." class="flex-1 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm" />
+                        <button id="apiKeyToggle" class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">👁️</button>
+                        <button id="apiKeySaveBtn" class="gradient-btn gradient-btn-sm">Save</button>
+                    </div>
+                    <div class="mt-2 flex items-center gap-2 text-sm">
+                        <span id="apiStatusDot" class="api-status valid"></span>
+                        <span id="apiStatusText" class="text-green-600 dark:text-green-400">Using mock mode – no key needed</span>
+                    </div>
+                </div>
+
+                <!-- Model Selection -->
+                <div class="form-section">
+                    <h3 class="font-semibold mb-2">🧠 Model</h3>
+                    <select id="modelSelect" class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm">
+                        <option value="google/gemini-2.0-flash-exp:free" selected>Gemini 2.0 Flash (free)</option>
+                        <option value="meta-llama/llama-3.2-3b-instruct:free">Llama 3.2 3B (free)</option>
+                        <option value="mistralai/mistral-7b-instruct:free">Mistral 7B (free)</option>
+                        <option value="openai/gpt-4o-mini">GPT-4o-mini</option>
+                        <option value="google/gemini-1.5-flash">Gemini 1.5 Flash</option>
+                    </select>
+                    <div id="modelInfo" class="mt-1 text-xs text-gray-400 dark:text-gray-500">OpenRouter models — free tiers available</div>
+                </div>
+
+                <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700"><span>Dark Mode</span><button id="settingsDarkToggle" class="toggle-track"><div class="toggle-thumb"></div></button></div>
+                <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700"><span>Notifications</span><button id="settingsNotifications" class="toggle-track active"><div class="toggle-thumb"></div></button></div>
+                <div class="flex items-center justify-between py-3"><span>Auto-save</span><button id="settingsAutosave" class="toggle-track active"><div class="toggle-thumb"></div></button></div>
+                <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-800/30 rounded-lg"><p class="text-sm text-gray-500 dark:text-gray-400">Storage used: <span id="settingsStorage">0 KB</span></p><button class="gradient-btn gradient-btn-sm mt-2" id="settingsExportData">📤 Export All Data</button><button class="gradient-btn gradient-btn-sm ml-2 bg-red-500 hover:bg-red-600" id="settingsClearData">🗑️ Clear All Data</button></div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center text-xs text-gray-400 dark:text-gray-500 border-t border-gray-200 dark:border-gray-800 pt-4">
+            © 2026 AI Student Career Hub · Powered by OpenRouter
+        </div>
+    </div>
+
+    <script>
+        // =============================================================
+        // CONFIGURATION – OpenRouter API (now empty, user must paste key)
+        // =============================================================
+        let AI_CONFIG = {
+            provider: 'mock', // default to mock mode (no key needed)
+            apiKey: '',
+            model: 'google/gemini-2.0-flash-exp:free'
+        };
+
+        // Provider configurations (only OpenRouter + mock)
+        const PROVIDERS = {
+            openrouter: {
+                name: 'OpenRouter',
+                url: 'https://openrouter.ai/api/v1/chat/completions',
+                models: ['google/gemini-2.0-flash-exp:free', 'meta-llama/llama-3.2-3b-instruct:free',
+                    'mistralai/mistral-7b-instruct:free', 'openai/gpt-4o-mini', 'google/gemini-1.5-flash'
+                ],
+                defaultModel: 'google/gemini-2.0-flash-exp:free',
+                keyPrefix: 'sk-or-v1-',
+                badge: 'openrouter'
+            },
+            mock: {
+                name: 'Mock',
+                url: null,
+                models: ['mock'],
+                defaultModel: 'mock',
+                keyPrefix: null,
+                badge: 'mock'
+            }
+        };
+
+        // ─── HELPERS ──────────────────────────────────────────────
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type} show`;
+            clearTimeout(toast._hide);
+            toast._hide = setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function getLS(key, def) {
+            try { const v = localStorage.getItem('aihub_' + key); return v ? JSON.parse(v) : def; } catch (e) { return def; }
+        }
+
+        function setLS(key, val) {
+            localStorage.setItem('aihub_' + key, JSON.stringify(val));
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        }
+
+        function formatDate(d) {
+            return new Date(d).toLocaleString();
+        }
+
+        // ─── AI CALL ENGINE ──────────────────────────────────────
+        async function callAI(prompt) {
+            const provider = AI_CONFIG.provider;
+            const apiKey = AI_CONFIG.apiKey;
+            const model = AI_CONFIG.model || PROVIDERS[provider]?.defaultModel || 'mock';
+
+            if (provider === 'mock' || !apiKey || apiKey.trim() === '') {
+                return generateMockResponse(prompt);
+            }
+
+            const config = PROVIDERS[provider];
+            if (!config) {
+                console.warn('Unknown provider, using mock');
+                return generateMockResponse(prompt);
+            }
+
+            try {
+                const response = await fetch(config.url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'AI Student Career Hub'
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [{ role: 'user', content: prompt }],
+                        temperature: 0.7,
+                        max_tokens: 2000
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMsg = errorData.error?.message || errorData.error || 'API request failed';
+                    if (errorMsg.includes('auth') || errorMsg.includes('key') || errorMsg.includes('credential')) {
+                        updateApiStatus(false);
+                        return generateMockResponse(prompt);
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                const data = await response.json();
+                const text = data.choices?.[0]?.message?.content || '';
+                if (!text) throw new Error('Empty response');
+                updateApiStatus(true);
+                return text;
+            } catch (err) {
+                console.warn(`AI (${provider}) error, using mock:`, err.message);
+                updateApiStatus(false);
+                return generateMockResponse(prompt);
+            }
+        }
+
+        // ─── IMPROVED MOCK RESPONSE GENERATOR (works for any topic) ───
+        function generateMockResponse(prompt) {
+            const lower = prompt.toLowerCase();
+
+            // ---- QUIZ GENERATION ----
+            if (lower.includes('quiz') || lower.includes('questions')) {
+                const topicMatch = lower.match(/topic["\s:]+([^"'\n,]+)/i);
+                const numQ = parseInt(lower.match(/(\d+)\s*questions?/i)?.[1]) || 5;
+                const difficulty = lower.includes('difficulty') ?
+                    (lower.includes('easy') ? 'easy' : lower.includes('hard') ? 'hard' : 'medium') :
+                    'medium';
+                const typeHint = lower.includes('truefalse') ? 'truefalse' :
+                    lower.includes('short') ? 'short' :
+                    lower.includes('mcq') ? 'mcq' : 'mixed';
+
+                const topic = topicMatch ? topicMatch[1].trim() : 'General Knowledge';
+                const questionCount = Math.min(numQ, 10);
+
+                // --- Generic question templates that adapt to any topic ---
+                const questionTemplates = [
+                    { q: `What is the primary goal of ${topic}?`, a: `To understand and apply the core principles of ${topic} effectively.` },
+                    { q: `Which skill is most essential for mastering ${topic}?`, a: `Critical thinking and hands‑on practice.` },
+                    { q: `What is a common challenge faced when learning ${topic}?`, a: `Keeping up with rapid advancements and practical implementation.` },
+                    { q: `How does ${topic} benefit the industry?`, a: `By improving efficiency, automating tasks, and enabling innovation.` },
+                    { q: `What is the future trend in ${topic}?`, a: `Integration with AI, automation, and data‑driven decision making.` },
+                    { q: `What is the first step to start a career in ${topic}?`, a: `Building a strong foundation through courses and projects.` },
+                    { q: `Which tool is commonly used in ${topic}?`, a: `Various industry‑standard tools like Python, TensorFlow, or similar.` },
+                    { q: `What makes a professional stand out in ${topic}?`, a: `A combination of deep knowledge, practical experience, and soft skills.` },
+                    { q: `What is the most exciting application of ${topic}?`, a: `Real‑world problem solving and creating impactful solutions.` },
+                    { q: `How can one stay updated in ${topic}?`, a: `Following research papers, attending webinars, and practicing regularly.` }
+                ];
+
+                // Shuffle and pick the required number
+                const shuffled = [...questionTemplates].sort(() => Math.random() - 0.5);
+                const selected = shuffled.slice(0, questionCount);
+
+                const questions = selected.map((item, i) => {
+                    let type = typeHint;
+                    if (type === 'mixed') {
+                        const types = ['mcq', 'mcq', 'truefalse', 'short', 'mcq'];
+                        type = types[i % types.length];
+                    }
+                    const q = {
+                        type: type,
+                        question: item.q,
+                        correctAnswer: item.a,
+                        explanation: `This is the correct answer because it aligns with the core principles of ${topic}.`
+                    };
+                    if (type === 'mcq') {
+                        const options = [
+                            item.a,
+                            `Alternative ${Math.floor(Math.random() * 100)}`,
+                            `Alternative ${Math.floor(Math.random() * 100)}`,
+                            `Alternative ${Math.floor(Math.random() * 100)}`
+                        ].sort(() => Math.random() - 0.5);
+                        q.options = options;
+                        q.correctAnswer = options[0];
+                    } else if (type === 'truefalse') {
+                        q.options = ['True', 'False'];
+                        q.correctAnswer = Math.random() > 0.5 ? 'True' : 'False';
+                    }
+                    return q;
+                });
+
+                return JSON.stringify(questions);
+            }
+
+            // ---- SUMMARY ----
+            if (lower.includes('summarize') || lower.includes('summary')) {
+                return `Summary: This is a comprehensive summary of your content. The material covers key concepts, important insights, and practical applications.
+
+                Bullet Points:
+                • The first key concept is explained with clear examples
+                • The second important idea builds on foundational knowledge
+                • The third major point connects theory to real-world practice
+                • Additional insights are provided for deeper understanding
+
+                Key Concepts:
+                Concept 1: Core theoretical framework and its evolution
+                Concept 2: Practical implementation strategies and best practices
+                Concept 3: Real-world applications and case studies
+
+                Important Questions:
+                1. What is the fundamental principle behind this concept?
+                2. How does this apply to current industry practices?
+                3. What are the limitations and potential improvements?
+                4. How can this knowledge be extended to other areas?
+
+                Revision Notes:
+                Focus on understanding the core principles and their applications.
+                Practice with examples and case studies to reinforce learning.`;
+            }
+
+            // ---- ROADMAP ----
+            if (lower.includes('roadmap') || lower.includes('career')) {
+                const careerMatch = lower.match(/become a?\s*([a-z\s]+?)(?:within|\n|$)/i);
+                const career = careerMatch ? careerMatch[1].trim() : 'Software Developer';
+                return `Timeline:
+                - 0-3 months: Foundation building for ${career}
+                - 3-6 months: Core skills development and practice
+                - 6-9 months: Advanced concepts and project work
+                - 9-12 months: Specialization and portfolio building
+
+                Courses:
+                - Introduction to ${career}
+                - Advanced ${career} Techniques
+                - Practical Applications and Case Studies
+                - Industry-specific Tools and Frameworks
+
+                Skills:
+                - Core technical skills for ${career}
+                - Soft skills: Communication, Teamwork, Problem-solving
+                - Industry-specific tools and technologies
+                - Version control and collaborative development
+
+                Projects:
+                - Beginner: Build a simple application
+                - Intermediate: Real-world use case implementation
+                - Advanced: End-to-end solution with documentation
+                - Open-source contribution
+
+                Certifications:
+                - Industry-recognized certification 1
+                - Advanced certification 2
+                - Specialized certification 3
+
+                Internships:
+                - Entry-level internships to gain experience
+                - Summer programs at top companies
+                - Remote and on-site opportunities
+
+                Interview Preparation:
+                - Practice common ${career} interview questions
+                - Prepare case studies and scenario responses
+                - Build a portfolio of projects
+                - Conduct mock interviews
+
+                Salary Insights:
+                - Entry-level: $60,000 - $85,000
+                - Mid-level: $85,000 - $120,000
+                - Senior-level: $120,000 - $160,000+
+                - Additional compensation: stock options, bonuses, benefits`;
+            }
+
+            // ---- ENHANCE ----
+            if (lower.includes('enhance') || lower.includes('resume') || lower.includes('portfolio')) {
+                return `Enhanced Version:
+                The content has been professionally refined to be more impactful and compelling.
+                Key improvements include stronger action verbs, clearer structure, and more persuasive language.
+                All suggestions are tailored to industry standards and best practices.
+
+                Specific Recommendations:
+                1. Use action-oriented language (e.g., "led," "developed," "implemented")
+                2. Quantify achievements with numbers and metrics where possible
+                3. Highlight transferable skills that align with job requirements
+                4. Ensure consistency in formatting and terminology
+
+                Before & After Examples:
+                - "Responsible for team" → "Led a team of 5 engineers to deliver a critical project"
+                - "Worked on features" → "Designed and implemented key features serving 10K+ users"
+                - "Helped with testing" → "Established QA processes that reduced bugs by 30%"`;
+            }
+
+            // ---- FALLBACK ----
+            return `I've analyzed your request and here's a comprehensive response:
+
+            1. Core Concept: The fundamental principle is well understood and applicable.
+            2. Practical Application: Real-world implementation would benefit from these strategies.
+            3. Next Steps: Consider these actionable items to move forward.
+
+            For more detailed responses, please provide additional context or be more specific about your needs.`;
+        }
+
+        // ─── API KEY STATUS ──────────────────────────────────────
+        function updateApiStatus(valid) {
+            const dot = document.getElementById('apiStatusDot');
+            const text = document.getElementById('apiStatusText');
+            if (!dot || !text) return;
+            const provider = AI_CONFIG.provider;
+            const providerName = PROVIDERS[provider]?.name || provider;
+            if (valid) {
+                dot.className = 'api-status valid';
+                text.textContent = `✅ ${providerName} API key is valid and working!`;
+                text.className = 'text-green-600 dark:text-green-400 text-sm';
+            } else {
+                dot.className = 'api-status invalid';
+                text.textContent = `⚠️ Using mock responses (${providerName} key invalid or not set)`;
+                text.className = 'text-yellow-600 dark:text-yellow-400 text-sm';
+            }
+        }
+
+        // ─── LOAD SETTINGS ──────────────────────────────────────
+        function loadSettings() {
+            const provider = localStorage.getItem('aihub_provider') || 'mock';
+            const apiKey = localStorage.getItem('aihub_api_key') || '';
+            const model = localStorage.getItem('aihub_model') || 'google/gemini-2.0-flash-exp:free';
+
+            AI_CONFIG.provider = provider;
+            AI_CONFIG.apiKey = apiKey;
+            AI_CONFIG.model = model;
+
+            const keyInput = document.getElementById('apiKeyInput');
+            if (keyInput) keyInput.value = apiKey;
+
+            document.querySelectorAll('.provider-btn').forEach(btn => {
+                btn.classList.toggle('border-indigo-500', btn.dataset.provider === provider);
+                btn.classList.toggle('bg-indigo-50', btn.dataset.provider === provider);
+                btn.classList.toggle('dark:bg-indigo-900/30', btn.dataset.provider === provider);
+                btn.classList.toggle('border-gray-300', btn.dataset.provider !== provider);
+                btn.classList.toggle('dark:border-gray-600', btn.dataset.provider !== provider);
+            });
+
+            updateModelDropdown(provider);
+            updateProviderInfo(provider);
+
+            if (provider === 'mock' || !apiKey || apiKey.trim() === '') {
+                updateApiStatus(false);
+            } else {
+                callAI('test').then(() => updateApiStatus(true)).catch(() => updateApiStatus(false));
+            }
+        }
+
+        function updateModelDropdown(provider) {
+            const select = document.getElementById('modelSelect');
+            const config = PROVIDERS[provider];
+            if (!config) {
+                select.innerHTML = `<option value="mock">Mock</option>`;
+                document.getElementById('modelInfo').textContent = 'Select a provider first';
+                return;
+            }
+            select.innerHTML = '';
+            config.models.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m;
+                if (m === AI_CONFIG.model) opt.selected = true;
+                select.appendChild(opt);
+            });
+            document.getElementById('modelInfo').textContent =
+                `${config.name} models — ${config.models.length} available`;
+        }
+
+        function updateProviderInfo(provider) {
+            const config = PROVIDERS[provider];
+            const badge = config?.badge || 'mock';
+            const name = config?.name || 'Mock';
+            const info = document.getElementById('providerInfo');
+            if (!info) return;
+            info.innerHTML =
+                `<span class="provider-badge ${badge}">${name}</span> ${provider === 'mock' ? 'Using built-in mock responses (no API key required)' : `Using model: <strong>${AI_CONFIG.model}</strong> (free tier)`}`;
+        }
+
+        // ─── PROVIDER BUTTONS ──────────────────────────────────
+        document.querySelectorAll('.provider-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const provider = this.dataset.provider;
+                const config = PROVIDERS[provider];
+                const defaultModel = config?.defaultModel || 'mock';
+
+                AI_CONFIG.provider = provider;
+                if (!AI_CONFIG.model || !config?.models?.includes(AI_CONFIG.model)) {
+                    AI_CONFIG.model = defaultModel;
+                }
+                setLS('aihub_provider', provider);
+                setLS('aihub_model', AI_CONFIG.model);
+                if (provider === 'mock') {
+                    setLS('aihub_api_key', '');
+                    AI_CONFIG.apiKey = '';
+                }
+
+                loadSettings();
+                showToast(`Switched to ${config?.name || provider}`, 'info');
+
+                const hint = document.querySelector('.api-key-hint');
+                if (hint) {
+                    if (provider === 'mock') {
+                        hint.style.display = 'block';
+                        hint.innerHTML =
+                            `<p class="text-sm text-gray-700 dark:text-gray-300">✅ You're using mock responses. No API key needed!</p>`;
+                    } else {
+                        hint.style.display = 'block';
+                        hint.innerHTML =
+                            `<p class="text-sm text-gray-700 dark:text-gray-300">💡 Get a free key from: <a href="https://openrouter.ai/keys" target="_blank" class="text-indigo-600 dark:text-indigo-400 underline">openrouter.ai/keys</a></p>`;
+                    }
+                }
+            });
+        });
+
+        // ─── SAVE API KEY ──────────────────────────────────────
+        document.getElementById('apiKeySaveBtn').addEventListener('click', () => {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            const provider = AI_CONFIG.provider;
+
+            if (provider === 'mock') {
+                showToast('You are in mock mode. No key needed.', 'info');
+                return;
+            }
+
+            if (key) {
+                const config = PROVIDERS[provider];
+                if (config?.keyPrefix && !key.startsWith(config.keyPrefix)) {
+                    showToast(`⚠️ ${config.name} keys usually start with "${config.keyPrefix}"`, 'warning');
+                }
+                setLS('aihub_api_key', key);
+                AI_CONFIG.apiKey = key;
+                updateApiStatus(false);
+                callAI('test').then(() => {
+                    updateApiStatus(true);
+                    showToast(`✅ ${config.name} API key saved and verified!`, 'success');
+                }).catch(() => {
+                    updateApiStatus(false);
+                    showToast(`⚠️ Key saved but verification failed. Using mock responses.`, 'warning');
+                });
+            } else {
+                setLS('aihub_api_key', '');
+                AI_CONFIG.apiKey = '';
+                updateApiStatus(false);
+                showToast('🔑 API key removed. Using mock responses.', 'info');
+            }
+        });
+
+        // ─── TOGGLE API KEY VISIBILITY ────────────────────────
+        document.getElementById('apiKeyToggle').addEventListener('click', () => {
+            const input = document.getElementById('apiKeyInput');
+            if (input.type === 'password') {
+                input.type = 'text';
+                document.getElementById('apiKeyToggle').textContent = '🙈';
+            } else {
+                input.type = 'password';
+                document.getElementById('apiKeyToggle').textContent = '👁️';
+            }
+        });
+
+        // ─── MODEL SELECT CHANGE ──────────────────────────────
+        document.getElementById('modelSelect').addEventListener('change', function() {
+            const model = this.value;
+            AI_CONFIG.model = model;
+            setLS('aihub_model', model);
+            const provider = AI_CONFIG.provider;
+            updateProviderInfo(provider);
+            showToast(`Model changed to ${model}`, 'info');
+        });
+
+        // ─── DARK MODE ─────────────────────────────────────────────
+        const darkToggleSidebar = document.getElementById('darkToggleSidebar');
+        const settingsDarkToggle = document.getElementById('settingsDarkToggle');
+
+        function setDarkMode(isDark) {
+            document.body.classList.toggle('dark', isDark);
+            if (darkToggleSidebar) darkToggleSidebar.classList.toggle('active', isDark);
+            if (settingsDarkToggle) settingsDarkToggle.classList.toggle('active', isDark);
+            setLS('darkMode', isDark);
+        }
+        const savedDark = getLS('darkMode', false);
+        setDarkMode(savedDark);
+        if (darkToggleSidebar) darkToggleSidebar.addEventListener('click', () => setDarkMode(!document.body.classList
+            .contains('dark')));
+        if (settingsDarkToggle) settingsDarkToggle.addEventListener('click', () => setDarkMode(!document.body.classList
+            .contains('dark')));
+
+        // ─── SIDEBAR ───────────────────────────────────────────────
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        };
+        document.getElementById('menuToggle').addEventListener('click', window.toggleSidebar);
+
+        // ─── NAVIGATION ────────────────────────────────────────────
+        const pageTitles = { landing: 'Home', dashboard: 'Dashboard', profile: 'Profile', resume: 'Resume Builder',
+            portfolio: 'Portfolio Generator', notes: 'Notes Summarizer', quiz: 'Quiz Generator',
+            flashcards: 'Flashcards', roadmap: 'Career Roadmap', coverletter: 'Cover Letter',
+            studyplanner: 'Study Planner', saved: 'Saved Files', settings: 'Settings' };
+
+        function navigateTo(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById('page-' + page);
+            if (target) target.classList.add('active');
+            document.querySelectorAll('#mainNav a').forEach(a => a.classList.remove('active'));
+            const navLink = document.querySelector(`#mainNav a[data-page="${page}"]`);
+            if (navLink) navLink.classList.add('active');
+            document.getElementById('pageTitle').textContent = pageTitles[page] || page;
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+            setLS('currentPage', page);
+        }
+        document.querySelectorAll('#mainNav a').forEach(a => { a.addEventListener('click', () => { const page = a
+                    .dataset.page; if (page) navigateTo(page); }); });
+        const lastPage = getLS('currentPage', 'dashboard');
+        navigateTo(lastPage);
+
+        // ─── LOGOUT ────────────────────────────────────────────────
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (confirm('Logout?')) { localStorage.removeItem('aihub_user');
+                showToast('Logged out', 'success');
+                navigateTo('landing'); }
+        });
+
+        // ─── USER GREETING ─────────────────────────────────────────
+        let currentUser = getLS('user', null);
+        if (!currentUser) { currentUser = { name: 'Student', email: 'student@example.com' };
+            setLS('user', currentUser); }
+        document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+        document.getElementById('userGreeting').textContent = `Welcome, ${currentUser.name}`;
+
+        // ─── DASHBOARD STATS ──────────────────────────────────────
+        function updateDashboardStats() {
+            const resumes = getLS('resumes', []);
+            const quizzes = getLS('quizzes', []);
+            const notes = getLS('notes', []);
+            document.getElementById('dashResumeCount').textContent = resumes.length;
+            document.getElementById('dashQuizCount').textContent = quizzes.length;
+            document.getElementById('dashNotesCount').textContent = notes.length;
+            const profile = getLS('profile', {});
+            const fields = ['name', 'email', 'bio', 'skills', 'education'];
+            let filled = 0;
+            fields.forEach(f => { if (profile[f] && profile[f].trim().length > 0) filled++; });
+            document.getElementById('dashProfileComplete').textContent = Math.min(Math.round((filled / fields.length) *
+            100), 100) + '%';
+        }
+        updateDashboardStats();
+
+        // ─── ADD TASK ──────────────────────────────────────────────
+        document.getElementById('addTaskBtn').addEventListener('click', () => {
+            const li = document.createElement('li');
+            li.className = 'flex items-center gap-3';
+            li.innerHTML =
+                `<input type="checkbox" class="rounded border-gray-300" /><span class="text-sm">New task</span><span class="ml-auto text-xs text-gray-400">Now</span>`;
+            document.getElementById('taskList').appendChild(li);
+            showToast('✅ Task added!', 'success');
+        });
+
+        // ─── PROFILE ──────────────────────────────────────────────
+        const profileData = getLS('profile', {});
+        document.getElementById('profileName').value = profileData.name || '';
+        document.getElementById('profileEmail').value = profileData.email || currentUser.email || '';
+        document.getElementById('profileBio').value = profileData.bio || '';
+        document.getElementById('profileSkills').value = profileData.skills || '';
+        document.getElementById('profileEducation').value = profileData.education || '';
+        document.getElementById('saveProfileBtn').addEventListener('click', () => {
+            const profile = {
+                name: document.getElementById('profileName').value.trim(),
+                email: document.getElementById('profileEmail').value.trim(),
+                bio: document.getElementById('profileBio').value.trim(),
+                skills: document.getElementById('profileSkills').value.trim(),
+                education: document.getElementById('profileEducation').value.trim()
+            };
+            setLS('profile', profile);
+            if (profile.name) { currentUser.name = profile.name;
+                setLS('user', currentUser);
+                document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+                document.getElementById('userGreeting').textContent = `Welcome, ${currentUser.name}`; }
+            showToast('✅ Profile saved!', 'success');
+            document.getElementById('profileStatus').textContent = '✅ Saved!';
+            updateDashboardStats();
+        });
+
+        // ─── RESUME BUILDER ──────────────────────────────────────
+        let resumes = getLS('resumes', []);
+        let currentResumeId = null;
+
+        function renderResumeSelector() {
+            const sel = document.getElementById('resumeSelector');
+            sel.innerHTML = '<option value="">-- Select a resume --</option>';
+            resumes.forEach(r => { const opt = document.createElement('option');
+                opt.value = r.id;
+                opt.textContent = r.fullName || 'Untitled Resume';
+                sel.appendChild(opt); });
+            if (currentResumeId) sel.value = currentResumeId;
+        }
+
+        function loadResume(id) {
+            const r = resumes.find(r => r.id === id);
+            if (!r) return;
+            currentResumeId = id;
+            document.getElementById('resumeId').value = id;
+            document.getElementById('resumeFullName').value = r.fullName || '';
+            document.getElementById('resumeEducation').value = r.education || '';
+            document.getElementById('resumeSkills').value = r.skills || '';
+            document.getElementById('resumeExperience').value = r.experience || '';
+            document.getElementById('resumeProjects').value = r.projects || '';
+            document.getElementById('resumeAchievements').value = r.achievements || '';
+            document.getElementById('resumeLanguages').value = r.languages || '';
+            document.getElementById('resumeSelector').value = id;
+            updateResumePreview();
+        }
+
+        function clearResumeForm() {
+            document.getElementById('resumeId').value = '';
+            currentResumeId = null;
+            document.getElementById('resumeFullName').value = '';
+            document.getElementById('resumeEducation').value = '';
+            document.getElementById('resumeSkills').value = '';
+            document.getElementById('resumeExperience').value = '';
+            document.getElementById('resumeProjects').value = '';
+            document.getElementById('resumeAchievements').value = '';
+            document.getElementById('resumeLanguages').value = '';
+            document.getElementById('resumeSelector').value = '';
+            updateResumePreview();
+        }
+
+        function updateResumePreview() {
+            const name = document.getElementById('resumeFullName').value.trim() || 'Your Name';
+            const edu = document.getElementById('resumeEducation').value.trim() || 'Your Education';
+            const skillsArr = document.getElementById('resumeSkills').value.split(',').map(s => s.trim()).filter(Boolean);
+            const exp = document.getElementById('resumeExperience').value.trim() || 'Your Experience';
+            const projArr = document.getElementById('resumeProjects').value.split(',').map(s => s.trim()).filter(Boolean);
+            const achArr = document.getElementById('resumeAchievements').value.split(',').map(s => s.trim()).filter(Boolean);
+            const langArr = document.getElementById('resumeLanguages').value.split(',').map(s => s.trim()).filter(Boolean);
+            let html = `<h1>${name}</h1>`;
+            if (edu) html += `<div class="subhead">🎓 ${edu}</div>`;
+            if (exp) html += `<div class="item"><strong>Experience</strong><br>${exp}</div>`;
+            if (skillsArr.length) { html += `<div class="section-title">Skills</div><div>`;
+                skillsArr.forEach(s => html += `<span class="skill-badge">${s}</span>`);
+                html += `</div>`; }
+            if (projArr.length) { html += `<div class="section-title">Projects</div><ul class="resume-list">`;
+                projArr.forEach(p => html += `<li>${p}</li>`);
+                html += `</ul>`; }
+            if (achArr.length) { html += `<div class="section-title">Achievements</div><ul class="resume-list">`;
+                achArr.forEach(a => html += `<li>${a}</li>`);
+                html += `</ul>`; }
+            if (langArr.length) { html += `<div class="section-title">Languages</div><div>`;
+                langArr.forEach(l => html += `<span class="skill-badge">${l}</span>`);
+                html += `</div>`; }
+            document.getElementById('resumePreview').innerHTML = html ||
+                '<div class="text-center text-gray-400">Fill in the form</div>';
+        }
+
+        document.querySelectorAll('#resumeForm input, #resumeForm textarea').forEach(el => { el.addEventListener('input',
+                updateResumePreview); });
+        document.getElementById('resumeNewBtn').addEventListener('click', () => { clearResumeForm();
+            showToast('📄 New resume started', 'info'); });
+        document.getElementById('resumeSelector').addEventListener('change', (e) => { if (e.target.value) loadResume(e
+                .target.value);
+            else clearResumeForm(); });
+        document.getElementById('resumeDeleteBtn').addEventListener('click', () => {
+            const id = document.getElementById('resumeId').value;
+            if (!id) { showToast('No resume selected', 'error'); return; }
+            if (!confirm('Delete this resume?')) return;
+            resumes = resumes.filter(r => r.id !== id);
+            setLS('resumes', resumes);
+            renderResumeSelector();
+            if (resumes.length > 0) loadResume(resumes[0].id);
+            else clearResumeForm();
+            showToast('🗑️ Resume deleted', 'info');
+            updateDashboardStats();
+        });
+        document.getElementById('resumeForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('resumeId').value || generateId();
+            const data = { id, fullName: document.getElementById('resumeFullName').value.trim(), education: document
+                    .getElementById('resumeEducation').value.trim(), skills: document.getElementById('resumeSkills')
+                    .value.trim(), experience: document.getElementById('resumeExperience').value.trim(),
+                projects: document.getElementById('resumeProjects').value.trim(), achievements: document
+                    .getElementById('resumeAchievements').value.trim(), languages: document.getElementById(
+                    'resumeLanguages').value.trim(), updatedAt: new Date().toISOString() };
+            const existing = resumes.findIndex(r => r.id === id);
+            if (existing >= 0) resumes[existing] = data;
+            else resumes.push(data);
+            setLS('resumes', resumes);
+            renderResumeSelector();
+            document.getElementById('resumeId').value = id;
+            currentResumeId = id;
+            document.getElementById('resumeSelector').value = id;
+            showToast('✅ Resume saved!', 'success');
+            updateDashboardStats();
+        });
+
+        document.getElementById('resumeAiBtn').addEventListener('click', async () => {
+            const status = document.getElementById('resumeAiStatus');
+            status.textContent = '🧠 Processing...';
+            const btn = document.getElementById('resumeAiBtn');
+            btn.disabled = true;
+            const data = { fullName: document.getElementById('resumeFullName').value.trim(), education: document
+                    .getElementById('resumeEducation').value.trim(), skills: document.getElementById('resumeSkills')
+                    .value.trim(), experience: document.getElementById('resumeExperience').value.trim(),
+                projects: document.getElementById('resumeProjects').value.trim(), achievements: document
+                    .getElementById('resumeAchievements').value.trim(), languages: document.getElementById(
+                    'resumeLanguages').value.trim() };
+            const prompt =
+                `You are an expert resume writer. Improve the following resume content to make it more professional, impactful, and ATS-friendly. Keep the same structure but enhance wording, add relevant keywords, and make it concise. Return only the improved text in the same order: fullName, education, skills (comma-separated), experience, projects (comma-separated), achievements (comma-separated), languages (comma-separated). Current content: Name: ${data.fullName || 'N/A'} Education: ${data.education || 'N/A'} Skills: ${data.skills || 'N/A'} Experience: ${data.experience || 'N/A'} Projects: ${data.projects || 'N/A'} Achievements: ${data.achievements || 'N/A'} Languages: ${data.languages || 'N/A'}`;
+            try {
+                const result = await callAI(prompt);
+                const lines = result.split('\n').filter(l => l.trim());
+                let idx = 0;
+                const fields = ['resumeFullName', 'resumeEducation', 'resumeSkills', 'resumeExperience',
+                    'resumeProjects', 'resumeAchievements', 'resumeLanguages'
+                ];
+                fields.forEach(fieldId => { const el = document.getElementById(fieldId); if (el && idx < lines
+                        .length) { let val = lines[idx].replace(/^[^:]+:\s*/, '').trim(); if (val) el.value =
+                        val;
+                        idx++; } });
+                updateResumePreview();
+                showToast('✨ Resume enhanced!', 'success');
+                status.textContent = '✅ Enhanced!';
+            } catch (err) { console.error(err);
+                showToast('Enhancement failed: ' + err.message, 'error');
+                status.textContent = '❌ Error: ' + err.message; } finally { btn.disabled = false; }
+        });
+
+        document.getElementById('resumePdfBtn').addEventListener('click', () => {
+            const el = document.getElementById('resumePreview');
+            if (el.innerHTML.includes('Fill in the form')) { showToast('Please fill in your resume first.',
+                'error'); return; }
+            const name = document.getElementById('resumeFullName').value.trim() || 'resume';
+            html2pdf().set({ margin: 0.5, filename: `${name}.pdf`, image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(
+                el).save();
+            showToast('📥 PDF download started!', 'success');
+        });
+        if (resumes.length > 0) loadResume(resumes[0].id);
+        renderResumeSelector();
+
+        // ─── PORTFOLIO GENERATOR ──────────────────────────────────
+        let portfolios = getLS('portfolios', []);
+        let currentPortfolioId = null;
+
+        function renderPortfolioSelector() {
+            const sel = document.getElementById('portfolioSelector');
+            sel.innerHTML = '<option value="">-- Select a portfolio --</option>';
+            portfolios.forEach(p => { const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = p.fullName || 'Untitled Portfolio';
+                sel.appendChild(opt); });
+            if (currentPortfolioId) sel.value = currentPortfolioId;
+        }
+
+        function loadPortfolio(id) {
+            const p = portfolios.find(p => p.id === id);
+            if (!p) return;
+            currentPortfolioId = id;
+            document.getElementById('portfolioId').value = id;
+            document.getElementById('portfolioFullName').value = p.fullName || '';
+            document.getElementById('portfolioTitle').value = p.title || '';
+            document.getElementById('portfolioBio').value = p.bio || '';
+            document.getElementById('portfolioEmail').value = p.email || '';
+            document.getElementById('portfolioSocial').value = p.social || '';
+            document.getElementById('portfolioSkills').value = p.skills || '';
+            document.getElementById('portfolioProjects').value = p.projects || '';
+            document.getElementById('portfolioSelector').value = id;
+            updatePortfolioPreview();
+        }
+
+        function clearPortfolioForm() {
+            document.getElementById('portfolioId').value = '';
+            currentPortfolioId = null;
+            document.getElementById('portfolioFullName').value = '';
+            document.getElementById('portfolioTitle').value = '';
+            document.getElementById('portfolioBio').value = '';
+            document.getElementById('portfolioEmail').value = '';
+            document.getElementById('portfolioSocial').value = '';
+            document.getElementById('portfolioSkills').value = '';
+            document.getElementById('portfolioProjects').value = '';
+            document.getElementById('portfolioSelector').value = '';
+            updatePortfolioPreview();
+        }
+
+        function updatePortfolioPreview() {
+            const name = document.getElementById('portfolioFullName').value.trim() || 'Your Name';
+            const t = document.getElementById('portfolioTitle').value.trim() || 'Your Title';
+            const b = document.getElementById('portfolioBio').value.trim() || 'Tell us about yourself.';
+            const e = document.getElementById('portfolioEmail').value.trim() || 'your@email.com';
+            let social = {};
+            try { social = JSON.parse(document.getElementById('portfolioSocial').value || '{}'); } catch (e) { social =
+                {}; }
+            const skillsArr = document.getElementById('portfolioSkills').value.split(',').map(s => s.trim()).filter(
+            Boolean);
+            let projectsArr = [];
+            try { projectsArr = JSON.parse(document.getElementById('portfolioProjects').value || '[]'); } catch (e) { projectsArr =
+                    []; }
+            const initial = name.charAt(0).toUpperCase();
+            let html =
+                `<div class="text-center"><div class="avatar">${initial}</div><h2 class="text-xl font-bold">${name}</h2><div class="text-sm text-gray-500">${t}</div><div class="text-sm mt-1">${e}</div><div class="mt-2">${b}</div><div class="mt-2">`;
+            Object.entries(social).forEach(([key, url]) => { html +=
+                    `<a href="${url}" target="_blank" class="social-link">${key}</a>`; });
+            html += `</div></div>`;
+            if (skillsArr.length) { html += `<div class="mt-4"><strong>Skills</strong><br>`;
+                skillsArr.forEach(s => html += `<span class="skill-badge">${s}</span>`);
+                html += `</div>`; }
+            if (projectsArr.length) { html += `<div class="mt-4"><strong>Projects</strong><br>`;
+                projectsArr.forEach(p => { html +=
+                        `<div class="project-card"><strong>${p.title || 'Project'}</strong>`;
+                    if (p.description) html += `<br><span class="text-sm">${p.description}</span>`;
+                    if (p.link) html +=
+                        `<br><a href="${p.link}" target="_blank" class="text-indigo-600 text-sm">🔗 Link</a>`;
+                    html += `</div>`; });
+                html += `</div>`; }
+            document.getElementById('portfolioPreview').innerHTML = html ||
+                '<div class="text-center text-gray-400">Fill in the form</div>';
+        }
+
+        document.querySelectorAll('#portfolioForm input, #portfolioForm textarea').forEach(el => { el.addEventListener(
+                'input', updatePortfolioPreview); });
+        document.getElementById('portfolioNewBtn').addEventListener('click', () => { clearPortfolioForm();
+            showToast('📄 New portfolio started', 'info'); });
+        document.getElementById('portfolioSelector').addEventListener('change', (e) => { if (e.target.value) loadPortfolio(
+                e.target.value);
+            else clearPortfolioForm(); });
+        document.getElementById('portfolioDeleteBtn').addEventListener('click', () => {
+            const id = document.getElementById('portfolioId').value;
+            if (!id) { showToast('No portfolio selected', 'error'); return; }
+            if (!confirm('Delete this portfolio?')) return;
+            portfolios = portfolios.filter(p => p.id !== id);
+            setLS('portfolios', portfolios);
+            renderPortfolioSelector();
+            if (portfolios.length > 0) loadPortfolio(portfolios[0].id);
+            else clearPortfolioForm();
+            showToast('🗑️ Portfolio deleted', 'info');
+        });
+        document.getElementById('portfolioForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('portfolioId').value || generateId();
+            const data = { id, fullName: document.getElementById('portfolioFullName').value.trim(), title: document
+                    .getElementById('portfolioTitle').value.trim(), bio: document.getElementById('portfolioBio')
+                    .value.trim(), email: document.getElementById('portfolioEmail').value.trim(), social: document
+                    .getElementById('portfolioSocial').value.trim(), skills: document.getElementById(
+                    'portfolioSkills').value.trim(), projects: document.getElementById('portfolioProjects')
+                    .value.trim(), updatedAt: new Date().toISOString() };
+            const existing = portfolios.findIndex(p => p.id === id);
+            if (existing >= 0) portfolios[existing] = data;
+            else portfolios.push(data);
+            setLS('portfolios', portfolios);
+            renderPortfolioSelector();
+            document.getElementById('portfolioId').value = id;
+            currentPortfolioId = id;
+            document.getElementById('portfolioSelector').value = id;
+            showToast('✅ Portfolio saved!', 'success');
+        });
+
+        document.getElementById('portfolioAiBtn').addEventListener('click', async () => {
+            const status = document.getElementById('portfolioAiStatus');
+            status.textContent = '🧠 Processing...';
+            const btn = document.getElementById('portfolioAiBtn');
+            btn.disabled = true;
+            const data = { fullName: document.getElementById('portfolioFullName').value.trim(), title: document
+                    .getElementById('portfolioTitle').value.trim(), bio: document.getElementById('portfolioBio')
+                    .value.trim(), skills: document.getElementById('portfolioSkills').value.trim(),
+                projects: document.getElementById('portfolioProjects').value.trim() };
+            const prompt =
+                `You are an expert career coach. Improve the following portfolio content to be more compelling and professional. Return only the improved text in the same order: fullName, title, bio, skills (comma-separated), projects (as JSON array with title, description, link if provided). Current: Name: ${data.fullName || 'N/A'} Title: ${data.title || 'N/A'} Bio: ${data.bio || 'N/A'} Skills: ${data.skills || 'N/A'} Projects: ${data.projects || '[]'}`;
+            try {
+                const result = await callAI(prompt);
+                const lines = result.split('\n').filter(l => l.trim());
+                let idx = 0;
+                const fields = ['portfolioFullName', 'portfolioTitle', 'portfolioBio', 'portfolioSkills',
+                    'portfolioProjects'
+                ];
+                fields.forEach(fieldId => { const el = document.getElementById(fieldId); if (el && idx < lines
+                        .length) { let val = lines[idx].replace(/^[^:]+:\s*/, '').trim(); if (val) el.value =
+                        val;
+                        idx++; } });
+                updatePortfolioPreview();
+                showToast('✨ Portfolio enhanced!', 'success');
+                status.textContent = '✅ Enhanced!';
+            } catch (err) { console.error(err);
+                showToast('Enhancement failed: ' + err.message, 'error');
+                status.textContent = '❌ Error: ' + err.message; } finally { btn.disabled = false; }
+        });
+
+        document.getElementById('portfolioZipBtn').addEventListener('click', async () => {
+            const name = document.getElementById('portfolioFullName').value.trim() || 'portfolio';
+            const previewHTML = document.getElementById('portfolioPreview').innerHTML;
+            const fullHTML = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>${name}'s Portfolio</title><script src="https://cdn.tailwindcss.com"><\/script><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" /><style>body{font-family:'Poppins',sans-serif;background:#F8FAFC;padding:40px;}.avatar{width:80px;height:80px;border-radius:50%;background:#4F46E5;color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:bold;margin:0 auto 10px;}.social-link{display:inline-block;margin:0 6px;color:#4F46E5;text-decoration:none;}.project-card{background:#f1f5f9;padding:12px;border-radius:8px;margin-bottom:10px;}.skill-badge{display:inline-block;background:#EEF2FF;color:#4F46E5;padding:2px 12px;border-radius:20px;font-size:0.8rem;margin:2px 4px 2px 0;}<\/style><\/head><body><div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg">${previewHTML}<\/div><\/body><\/html>`;
+            try { const zip = new JSZip();
+                zip.file('index.html', fullHTML);
+                const blob = await zip.generateAsync({ type: 'blob' });
+                saveAs(blob, `${name.replace(/\s+/g, '_')}_portfolio.zip`);
+                showToast('📦 Portfolio downloaded as ZIP!', 'success'); } catch (err) { showToast('Failed to create ZIP.',
+                    'error'); }
+        });
+        document.getElementById('portfolioPublishBtn').addEventListener('click', () => { showToast(
+                '🚀 Publishing feature coming soon!', 'info'); });
+        if (portfolios.length > 0) loadPortfolio(portfolios[0].id);
+        renderPortfolioSelector();
+
+        // ─── NOTES SUMMARIZER ──────────────────────────────────────
+        let notes = getLS('notes', []);
+
+        function renderNotesHistory() {
+            const list = document.getElementById('notesHistoryList');
+            list.innerHTML = '';
+            if (notes.length === 0) { list.innerHTML =
+                    '<div class="text-gray-400 dark:text-gray-500 text-sm">No saved summaries yet</div>'; return; }
+            notes.slice().reverse().forEach(n => { const item = document.createElement('div');
+                item.className = 'saved-item text-sm';
+                const preview = n.summary ? n.summary.slice(0, 60) + '...' : 'Untitled';
+                item.innerHTML =
+                    `<div><strong>${n.source || 'notes'}</strong> - ${preview}</div><div class="text-xs text-gray-500">${formatDate(n.createdAt)}</div>`;
+                item.addEventListener('click', () => { displayNotesResult(n);
+                    showToast('📂 Loaded saved summary', 'info'); });
+                list.appendChild(item); });
+        }
+
+        function displayNotesResult(data) {
+            const container = document.getElementById('notesResultContainer');
+            const sections = [{ key: 'summary', label: '📄 Summary' }, { key: 'bulletPoints', label: '• Bullet Points' },
+                { key: 'keyConcepts', label: '🔑 Key Concepts' }, { key: 'importantQuestions',
+                    label: '❓ Important Questions' }, { key: 'revisionNotes', label: '📝 Revision Notes' }
+            ];
+            let html = `<div class="flex flex-wrap gap-2 mb-3">`;
+            sections.forEach((s, i) => { html +=
+                    `<button class="tab-btn ${i===0?'active':''}" data-notes-result="${s.key}">${s.label}</button>`; });
+            html += `</div><div id="notesResultContent">`;
+            html += `<div class="result-section">${data[sections[0].key] || 'No content'}</div>`;
+            html += `</div>`;
+            container.innerHTML = html;
+            container.querySelectorAll('[data-notes-result]').forEach(btn => { btn.addEventListener('click', () => { container
+                        .querySelectorAll('[data-notes-result]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const key = btn.dataset.notesResult;
+                    const content = data[key] || 'No content';
+                    container.querySelector('#notesResultContent').innerHTML =
+                        `<div class="result-section">${content}</div>`; }); });
+            window._currentNotesResult = data;
+        }
+
+        document.querySelectorAll('[data-notes-tab]').forEach(btn => { btn.addEventListener('click', () => { document
+                    .querySelectorAll('[data-notes-tab]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const tab = btn.dataset.notesTab;
+                document.getElementById('notesPasteTab').classList.toggle('hidden', tab !== 'paste');
+                document.getElementById('notesFileTab').classList.toggle('hidden', tab !== 'file'); }); });
+
+        const notesDropZone = document.getElementById('notesDropZone');
+        const notesFileInput = document.getElementById('notesFileInput');
+        let notesSelectedFile = null;
+        notesDropZone.addEventListener('click', () => notesFileInput.click());
+        notesDropZone.addEventListener('dragover', (e) => { e.preventDefault();
+            notesDropZone.style.borderColor = '#4F46E5'; });
+        notesDropZone.addEventListener('dragleave', () => notesDropZone.style.borderColor = '#cbd5e1');
+        notesDropZone.addEventListener('drop', (e) => { e.preventDefault();
+            notesDropZone.style.borderColor = '#cbd5e1'; if (e.dataTransfer.files.length) handleNotesFile(e.dataTransfer
+                .files[0]); });
+        notesFileInput.addEventListener('change', (e) => { if (e.target.files.length) handleNotesFile(e.target.files[0]); });
+
+        function handleNotesFile(file) { notesSelectedFile = file;
+            document.getElementById('notesFileName').textContent = `📎 ${file.name}`;
+            document.getElementById('notesFileName').classList.remove('hidden'); }
+
+        document.getElementById('notesSummarizeBtn').addEventListener('click', async () => {
+            const activeTab = document.querySelector('[data-notes-tab].active');
+            let text = '';
+            let file = null;
+            if (activeTab.dataset.notesTab === 'paste') { text = document.getElementById('notesTextInput').value
+                    .trim(); if (!text) { showToast('Please paste some text to summarize.', 'error'); return; } } else { if (
+                    !notesSelectedFile) { showToast('Please select a file to upload.', 'error'); return; }
+                file = notesSelectedFile; if (file.type === 'text/plain') { text = await file.text(); } else { text =
+                        `[Content from ${file.name}] - Please paste text directly for full summarization.`; } }
+            const btn = document.getElementById('notesSummarizeBtn');
+            const spinner = document.getElementById('notesSummarizeSpinner');
+            const status = document.getElementById('notesStatus');
+            btn.disabled = true;
+            document.getElementById('notesSummarizeText').classList.add('hidden');
+            spinner.classList.remove('hidden');
+            status.textContent = '⏳ Processing...';
+            const prompt =
+                `You are an expert summarizer. Summarize the following text into a clear, structured summary. Provide the output in the following sections: Summary: (concise overview) Bullet Points: (key points in bullet list) Key Concepts: (main ideas) Important Questions: (thought-provoking questions) Revision Notes: (succinct notes for review) Text to summarize: ${text.substring(0, 15000)}`;
+            try {
+                const result = await callAI(prompt);
+                const sections = { summary: '', bulletPoints: '', keyConcepts: '', importantQuestions: '',
+                    revisionNotes: '' };
+                let currentKey = null;
+                result.split('\n').forEach(line => {
+                    const trimmed = line.trim();
+                    if (trimmed.toLowerCase().startsWith('summary:')) { currentKey = 'summary';
+                        sections.summary = trimmed.replace(/^summary:\s*/i, ''); } else if (trimmed
+                        .toLowerCase().startsWith('bullet points:')) { currentKey = 'bulletPoints';
+                        sections.bulletPoints = trimmed.replace(/^bullet points:\s*/i, ''); } else if (trimmed
+                        .toLowerCase().startsWith('key concepts:')) { currentKey = 'keyConcepts';
+                        sections.keyConcepts = trimmed.replace(/^key concepts:\s*/i, ''); } else if (trimmed
+                        .toLowerCase().startsWith('important questions:')) { currentKey =
+                            'importantQuestions';
+                        sections.importantQuestions = trimmed.replace(/^important questions:\s*/i, ''); } else if (
+                        trimmed.toLowerCase().startsWith('revision notes:')) { currentKey = 'revisionNotes';
+                        sections.revisionNotes = trimmed.replace(/^revision notes:\s*/i, ''); } else if (
+                        currentKey && trimmed) { sections[currentKey] += ' ' + trimmed; }
+                });
+                if (!sections.summary && !sections.bulletPoints) { sections.summary = result; }
+                const source = file ? file.name : 'pasted text';
+                const data = { ...sections, source, createdAt: new Date().toISOString() };
+                notes.push(data);
+                setLS('notes', notes);
+                displayNotesResult(data);
+                renderNotesHistory();
+                showToast('✅ Summary generated!', 'success');
+                status.textContent = '✅ Done.';
+            } catch (err) { console.error(err);
+                showToast('Summarization failed: ' + err.message, 'error');
+                status.textContent = '❌ Error: ' + err.message; } finally { btn.disabled = false;
+                document.getElementById('notesSummarizeText').classList.remove('hidden');
+                spinner.classList.add('hidden'); }
+        });
+
+        document.getElementById('notesDownloadBtn').addEventListener('click', () => {
+            const data = window._currentNotesResult;
+            if (!data) { showToast('No result to download.', 'error'); return; }
+            const parts = ['📄 SUMMARY', '='.repeat(40), data.summary || '', '\n\n• BULLET POINTS', '='.repeat(40),
+                data.bulletPoints || '', '\n\n🔑 KEY CONCEPTS', '='.repeat(40), data.keyConcepts || '',
+                '\n\n❓ IMPORTANT QUESTIONS', '='.repeat(40), data.importantQuestions || '',
+                '\n\n📝 REVISION NOTES', '='.repeat(40), data.revisionNotes || ''
+            ];
+            const blob = new Blob([parts.join('\n')], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `summary_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('📥 Download started!', 'success');
+        });
+
+        document.getElementById('notesClearHistoryBtn').addEventListener('click', () => {
+            if (!confirm('Delete all saved summaries?')) return;
+            notes = [];
+            setLS('notes', notes);
+            renderNotesHistory();
+            showToast('🗑️ History cleared', 'info');
+        });
+        renderNotesHistory();
+
+        // ─── QUIZ GENERATOR ────────────────────────────────────────
+        let quizzes = getLS('quizzes', []);
+        let leaderboard = getLS('leaderboard', []);
+        let currentQuiz = null;
+        let quizUserAnswers = {};
+        let quizTimerInterval = null;
+        let quizTimeLeft = 0;
+        let quizTotalTime = 0;
+        let quizIsSubmitted = false;
+
+        function renderQuizHistory() {
+            const list = document.getElementById('quizHistoryList');
+            list.innerHTML = '';
+            if (quizzes.length === 0) { list.innerHTML =
+                    '<div class="text-gray-400 dark:text-gray-500 text-sm">No quiz history</div>'; return; }
+            quizzes.slice().reverse().forEach(q => { const item = document.createElement('div');
+                item.className = 'saved-item text-sm';
+                const emoji = q.passed ? '✅' : '📝';
+                item.innerHTML =
+                    `<div><strong>${q.topic || 'Untitled'}</strong> - ${emoji} ${q.score}/${q.total} (${q.percentage}%)</div><div class="text-xs text-gray-500">${formatDate(q.createdAt)}</div>`;
+                item.addEventListener('click', () => { if (q.results) { displayQuizResults(q.results, q.score, q
+                            .total, q.percentage, q.passed); } });
+                list.appendChild(item); });
+        }
+
+        function renderLeaderboard() {
+            const list = document.getElementById('quizLeaderboard');
+            list.innerHTML = '';
+            const sorted = [...leaderboard].sort((a, b) => b.percentage - a.percentage);
+            if (sorted.length === 0) { list.innerHTML =
+                    '<div class="text-gray-400 dark:text-gray-500 text-sm">No scores yet</div>'; return; }
+            sorted.slice(0, 20).forEach((entry, i) => { const div = document.createElement('div');
+                div.className = 'leaderboard-entry';
+                div.innerHTML =
+                    `<span class="rank">#${i+1}</span><span class="font-medium">${entry.name || 'Anonymous'}</span><span class="score">${entry.percentage}%</span><span class="date">${entry.topic ? entry.topic.slice(0,15) : ''}</span>`;
+                list.appendChild(div); });
+        }
+
+        function displayQuizResults(results, score, total, percentage, passed) {
+            const container = document.getElementById('quizResultsContainer');
+            container.classList.remove('hidden');
+            document.getElementById('quizContainer').classList.add('hidden');
+            const emoji = passed ? '🎉' : '💪';
+            let html =
+                `<div class="text-center mb-4"><div class="text-3xl font-bold ${passed ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}">${emoji} ${score}/${total}</div><div class="text-lg">${percentage}% ${passed ? '✅ Passed' : '❌ Needs Improvement'}</div></div><div class="space-y-3 max-h-80 overflow-y-auto">`;
+            results.forEach((r, i) => { const icon = r.isCorrect ? '✅' : '❌';
+                const color = r.isCorrect ? 'text-emerald-600 dark:text-emerald-400' :
+                    'text-red-600 dark:text-red-400';
+                html +=
+                    `<div class="border-b border-gray-200 dark:border-gray-700 pb-2"><div class="font-medium">${i+1}. ${r.question}</div><div class="text-sm">Your answer: <span class="${color}">${r.userAnswer || '(not answered)'}</span></div><div class="text-sm text-gray-500">Correct: ${r.correctAnswer}</div>${r.explanation ? `<div class="text-sm text-gray-500">💡 ${r.explanation}</div>` : ''}</div>`; });
+            html += `</div>`;
+            document.getElementById('quizResultsContent').innerHTML = html;
+        }
+
+        document.getElementById('quizForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const topic = document.getElementById('quizTopic').value.trim();
+            if (!topic) { showToast('Please enter a topic.', 'error'); return; }
+            const btn = document.getElementById('quizGenerateText');
+            const spinner = document.getElementById('quizGenerateSpinner');
+            const status = document.getElementById('quizGenStatus');
+            btn.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            status.textContent = '⏳ Generating quiz...';
+            const numQ = parseInt(document.getElementById('quizNumQuestions').value);
+            const diff = document.getElementById('quizDifficulty').value;
+            const types = document.getElementById('quizTypes').value;
+            const prompt =
+                `Generate a quiz on the topic "${topic}" with ${numQ} questions. Difficulty: ${diff}. Question types: ${types}. Return the quiz as a JSON array of objects, each with fields: "type" (mcq, truefalse, or short), "question" (string), "options" (array for mcq/truefalse, else null), "correctAnswer" (string), and "explanation" (string). For truefalse, options should be ["True", "False"]. Ensure the questions are educational and relevant.`;
+            try {
+                const result = await callAI(prompt);
+                let questions;
+                try { const jsonMatch = result.match(/\[[\s\S]*\]/); if (jsonMatch) { questions = JSON.parse(
+                        jsonMatch[0]); } else { questions = JSON.parse(result); } } catch (e) { throw new Error(
+                        'Failed to parse quiz JSON from response.'); }
+                if (!Array.isArray(questions) || questions.length === 0) { throw new Error(
+                        'No questions generated.'); }
+                const data = { title: `${topic} Quiz`, questions };
+                currentQuiz = data;
+                startQuiz(data);
+                showToast('✅ Quiz generated!', 'success');
+                status.textContent = '✅ Done.';
+            } catch (err) { console.error(err);
+                showToast('Quiz generation failed: ' + err.message, 'error');
+                status.textContent = '❌ Error: ' + err.message; } finally { btn.classList.remove('hidden');
+                spinner.classList.add('hidden'); }
+        });
+
+        function startQuiz(quiz) {
+            quizIsSubmitted = false;
+            quizUserAnswers = {};
+            document.getElementById('quizContainer').classList.remove('hidden');
+            document.getElementById('quizResultsContainer').classList.add('hidden');
+            document.getElementById('quizTitle').textContent = `📝 ${quiz.title || 'Quiz'}`;
+            let html = '';
+            quiz.questions.forEach((q, index) => {
+                const num = index + 1;
+                html += `<div class="question-container" data-qid="${q.id || index}">`;
+                html += `<div class="question-number">Q${num}:</div>`;
+                html += `<div class="font-medium mb-2">${q.question}</div><div class="space-y-2">`;
+                if (q.type === 'mcq' && q.options) { q.options.forEach(opt => { html +=
+                        `<button class="option-btn" data-qid="${q.id || index}" data-value="${opt}">${opt}</button>`; }); } else if (
+                    q.type === 'truefalse') { ['True', 'False'].forEach(opt => { html +=
+                        `<button class="option-btn" data-qid="${q.id || index}" data-value="${opt}">${opt}</button>`; }); } else { html +=
+                        `<textarea class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg" rows="2" placeholder="Type your answer..." data-qid="${q.id || index}"></textarea>`; }
+                html += `</div></div>`;
+            });
+            document.getElementById('quizQuestionsContainer').innerHTML = html;
+            document.querySelectorAll('#quizQuestionsContainer .option-btn').forEach(btn => { btn.addEventListener(
+                    'click', () => { const qid = btn.dataset.qid; const parent = btn.closest(
+                        '.question-container');
+                        parent.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        quizUserAnswers[qid] = btn.dataset.value;
+                        updateQuizScore(); }); });
+            document.querySelectorAll('#quizQuestionsContainer textarea').forEach(ta => { ta.addEventListener(
+                    'input', () => { quizUserAnswers[ta.dataset.qid] = ta.value;
+                        updateQuizScore(); }); });
+            const totalQ = quiz.questions.length;
+            quizTotalTime = Math.max(30, totalQ * 45);
+            quizTimeLeft = quizTotalTime;
+            updateQuizTimer();
+            if (quizTimerInterval) clearInterval(quizTimerInterval);
+            quizTimerInterval = setInterval(() => { quizTimeLeft--;
+                updateQuizTimer(); if (quizTimeLeft <= 0) { clearInterval(quizTimerInterval);
+                    submitQuiz(); } }, 1000);
+            updateQuizScore();
+        }
+
+        function updateQuizTimer() {
+            const mins = Math.floor(quizTimeLeft / 60);
+            const secs = quizTimeLeft % 60;
+            document.getElementById('quizTimer').textContent = `⏱️ ${mins}:${secs.toString().padStart(2, '0')}`;
+            const pct = (quizTimeLeft / quizTotalTime) * 100;
+            const fill = document.getElementById('quizTimerFill');
+            fill.style.width = pct + '%';
+            fill.className = 'fill' + (pct < 20 ? ' danger' : pct < 50 ? ' warning' : '');
+        }
+
+        function updateQuizScore() {
+            const total = currentQuiz?.questions?.length || 0;
+            const answered = Object.keys(quizUserAnswers).filter(k => { const val = quizUserAnswers[k]; return val &&
+                    val.trim().length > 0; }).length;
+            document.getElementById('quizScore').textContent = `⭐ ${answered}/${total}`;
+        }
+
+        document.getElementById('quizSubmitBtn').addEventListener('click', () => {
+            if (quizIsSubmitted) return;
+            const total = currentQuiz?.questions?.length || 0;
+            if (Object.keys(quizUserAnswers).length < total) { if (!confirm(
+                    'You have unanswered questions. Submit anyway?')) return; }
+            submitQuiz();
+        });
+
+        function submitQuiz() {
+            if (quizIsSubmitted || !currentQuiz) return;
+            quizIsSubmitted = true;
+            clearInterval(quizTimerInterval);
+            const questions = currentQuiz.questions;
+            let correct = 0;
+            const results = [];
+            questions.forEach((q, index) => {
+                const qid = q.id || index;
+                const userAns = quizUserAnswers[qid] || '';
+                const isCorrect = userAns.toLowerCase().trim() === q.correctAnswer.toLowerCase().trim();
+                if (isCorrect) correct++;
+                results.push({ question: q.question, type: q.type, userAnswer: userAns, correctAnswer: q
+                        .correctAnswer, isCorrect, explanation: q.explanation || '' });
+            });
+            const total = questions.length;
+            const score = correct;
+            const percentage = Math.round((score / total) * 100);
+            const passed = percentage >= 60;
+            const quizData = { topic: document.getElementById('quizTopic').value.trim(), score, total, percentage,
+                passed, results, title: currentQuiz.title || 'Quiz', createdAt: new Date().toISOString(),
+                name: currentUser.name || 'Student' };
+            quizzes.push(quizData);
+            setLS('quizzes', quizzes);
+            const existing = leaderboard.findIndex(l => l.name === currentUser.name);
+            if (existing >= 0) { if (leaderboard[existing].percentage < percentage) { leaderboard[existing] = { ...
+                        leaderboard[existing], percentage, score, total, topic: quizData.topic }; } } else { leaderboard
+                    .push({ name: currentUser.name || 'Student', percentage, score, total, topic: quizData
+                        .topic }); }
+            setLS('leaderboard', leaderboard);
+            displayQuizResults(results, score, total, percentage, passed);
+            renderQuizHistory();
+            renderLeaderboard();
+            showToast(`📊 Quiz complete! Score: ${score}/${total}`, passed ? 'success' : 'info');
+        }
+
+        document.getElementById('quizRetryBtn').addEventListener('click', () => { document.getElementById(
+                'quizResultsContainer').classList.add('hidden');
+            document.getElementById('quizContainer').classList.add('hidden');
+            document.getElementById('quizTopic').value = '';
+            showToast('🔄 Ready for a new quiz!', 'info'); });
+        document.getElementById('quizClearHistoryBtn').addEventListener('click', () => {
+            if (!confirm('Delete all quiz history?')) return;
+            quizzes = [];
+            setLS('quizzes', quizzes);
+            renderQuizHistory();
+            showToast('🗑️ History cleared', 'info');
+        });
+        renderQuizHistory();
+        renderLeaderboard();
+
+        // ─── CAREER ROADMAP ────────────────────────────────────────
+        let roadmaps = getLS('roadmaps', []);
+        let currentRoadmap = null;
+
+        function renderRoadmapHistory() {
+            const list = document.getElementById('roadmapHistoryList');
+            list.innerHTML = '';
+            if (roadmaps.length === 0) { list.innerHTML =
+                    '<div class="text-gray-400 dark:text-gray-500 text-sm">No roadmaps yet</div>'; return; }
+            roadmaps.slice().reverse().forEach(r => {
+                const item = document.createElement('div');
+                item.className = 'saved-item text-sm';
+                const timelineDisplay = r.selectedTimeline || r.timeline || '';
+                item.innerHTML =
+                    `<div><strong>${r.career || 'Roadmap'}</strong> ${timelineDisplay ? '(' + timelineDisplay + ')' : ''}</div><div class="text-xs text-gray-500">${formatDate(r.createdAt)}</div>`;
+                item.addEventListener('click', () => {
+                    displayRoadmap(r);
+                    currentRoadmap = r;
+                    showToast('📂 Loaded roadmap', 'info');
+                });
+                list.appendChild(item);
+            });
+        }
+
+        function displayRoadmap(roadmap) {
+            const container = document.getElementById('roadmapContainer');
+            container.classList.remove('hidden');
+            document.getElementById('roadmapTitle').textContent = `🗺️ ${roadmap.title || roadmap.career || 'Roadmap'}`;
+            const sections = [{ key: 'timeline', label: '⏳ Timeline' }, { key: 'courses', label: '📚 Courses' },
+                { key: 'skills', label: '🛠️ Skills' }, { key: 'projects', label: '🚀 Projects' },
+                { key: 'certifications', label: '📜 Certifications' }, { key: 'internships',
+                    label: '💼 Internships' }, { key: 'interviewPrep', label: '🎤 Interview Preparation' },
+                { key: 'salaryInsights', label: '💰 Salary Insights' }
+            ];
+            let html = '';
+            sections.forEach(sec => {
+                const content = roadmap[sec.key];
+                if (!content) return;
+                html += `<div class="roadmap-section"><h3>${sec.label}</h3>`;
+                if (Array.isArray(content)) {
+                    if (sec.key === 'timeline') { html += `<div class="roadmap-timeline">`;
+                        content.forEach(item => { if (typeof item === 'object') { html +=
+                                `<div class="phase"><div class="time">${item.time || ''}</div><div class="desc">${item.phase || item.description || ''}</div></div>`; } else { html +=
+                                `<div class="phase"><div class="desc">${item}</div></div>`; } });
+                        html += `</div>`; } else { html += `<ul>`;
+                        content.forEach(item => { if (typeof item === 'object' && item.name) { html +=
+                                `<li><strong>${item.name}</strong>${item.description ? ' - ' + item.description : ''}</li>`; } else { html +=
+                                `<li>${item}</li>`; } });
+                        html += `</ul>`; }
+                } else if (typeof content === 'string') { html += `<p>${content}</p>`; } else if (typeof content ===
+                    'object') { html += `<ul>`;
+                    for (const [key, val] of Object.entries(content)) { html +=
+                        `<li><strong>${key}:</strong> ${val}</li>`; }
+                    html += `</ul>`; }
+                html += `</div>`;
+            });
+            document.getElementById('roadmapContent').innerHTML = html;
+        }
+
+        document.getElementById('roadmapForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const career = document.getElementById('roadmapCareer').value;
+            const selectedTimeline = document.getElementById('roadmapTimeline').value;
+            if (!career) { showToast('Please select a career path.', 'error'); return; }
+            const btn = document.getElementById('roadmapGenerateText');
+            const spinner = document.getElementById('roadmapGenerateSpinner');
+            const status = document.getElementById('roadmapStatus');
+            btn.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            status.textContent = '⏳ Generating roadmap...';
+            const prompt =
+                `You are a career expert. Create a detailed career roadmap for a student aiming to become a ${career} within ${selectedTimeline}. Provide the roadmap in the following structured format with clear sections: - Timeline: (breakdown of phases with timeframes and activities) - Courses: (list of recommended courses) - Skills: (list of key skills) - Projects: (suggested projects) - Certifications: (relevant certifications) - Internships: (internship opportunities) - Interview Preparation: (tips and resources) - Salary Insights: (expected salary ranges) Make it practical, actionable, and detailed.`;
+            try {
+                const result = await callAI(prompt);
+                const sections = { timeline: [], courses: [], skills: [], projects: [], certifications: [],
+                    internships: [], interviewPrep: '', salaryInsights: '' };
+                let currentSection = null;
+                const lines = result.split('\n');
+                lines.forEach(line => {
+                    const trimmed = line.trim();
+                    if (trimmed.toLowerCase().startsWith('timeline:')) { currentSection = 'timeline'; } else if (
+                        trimmed.toLowerCase().startsWith('courses:')) { currentSection = 'courses'; } else if (
+                        trimmed.toLowerCase().startsWith('skills:')) { currentSection = 'skills'; } else if (
+                        trimmed.toLowerCase().startsWith('projects:')) { currentSection = 'projects'; } else if (
+                        trimmed.toLowerCase().startsWith('certifications:')) { currentSection =
+                        'certifications'; } else if (trimmed.toLowerCase().startsWith('internships:')) { currentSection =
+                            'internships'; } else if (trimmed.toLowerCase().startsWith(
+                            'interview preparation:')) { currentSection = 'interviewPrep'; } else if (trimmed
+                        .toLowerCase().startsWith('salary insights:')) { currentSection =
+                            'salaryInsights'; } else if (currentSection) {
+                        if (trimmed.startsWith('-') || trimmed.startsWith('•')) {
+                            const item = trimmed.replace(/^[-•]\s*/, '');
+                            if (currentSection === 'timeline') { const parts = item.split(':');
+                                if (parts.length >= 2) { sections.timeline.push({ time: parts[0]
+                                        .trim(), description: parts.slice(1).join(':').trim() }); } else { sections
+                                        .timeline.push(item); } } else if (['courses', 'skills', 'projects',
+                                    'certifications', 'internships'
+                                ].includes(currentSection)) { sections[currentSection].push(item); } else { sections[
+                                        currentSection] += item + ' '; }
+                        } else if (trimmed) { if (['interviewPrep', 'salaryInsights'].includes(
+                            currentSection)) { sections[currentSection] += trimmed + ' '; } }
+                    }
+                });
+                Object.keys(sections).forEach(key => { if (typeof sections[key] === 'string') sections[key] =
+                        sections[key].trim(); });
+                const roadmapData = {
+                    career,
+                    selectedTimeline,
+                    title: `${career} Roadmap`,
+                    ...sections,
+                    createdAt: new Date().toISOString()
+                };
+                roadmaps.push(roadmapData);
+                setLS('roadmaps', roadmaps);
+                displayRoadmap(roadmapData);
+                currentRoadmap = roadmapData;
+                renderRoadmapHistory();
+                showToast('✅ Roadmap generated!', 'success');
+                status.textContent = '✅ Done.';
+            } catch (err) { console.error(err);
+                showToast('Roadmap generation failed: ' + err.message, 'error');
+                status.textContent = '❌ Error: ' + err.message; } finally { btn.classList.remove('hidden');
+                spinner.classList.add('hidden'); }
+        });
+
+        document.getElementById('roadmapDownloadBtn').addEventListener('click', () => {
+            if (!currentRoadmap) { showToast('No roadmap to download.', 'error'); return; }
+            const lines = [`CAREER ROADMAP: ${currentRoadmap.title || currentRoadmap.career || 'Roadmap'}`,
+                '='.repeat(60)
+            ];
+            const sections = ['timeline', 'courses', 'skills', 'projects', 'certifications', 'internships',
+                'interviewPrep', 'salaryInsights'
+            ];
+            sections.forEach(key => {
+                const content = currentRoadmap[key];
+                if (!content) return;
+                const label = key.charAt(0).toUpperCase() + key.slice(1);
+                lines.push(`\n${label}:`);
+                if (Array.isArray(content)) { content.forEach(item => { if (typeof item === 'object') { lines
+                            .push(`  - ${item.time || ''}: ${item.phase || item.description || ''}`); } else { lines
+                            .push(`  - ${item}`); } }); } else if (typeof content === 'string') { lines.push(
+                        `  ${content}`); } else if (typeof content === 'object') { for (const [k, v] of Object
+                        .entries(content)) { lines.push(`  - ${k}: ${v}`); } }
+            });
+            const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${currentRoadmap.career || 'roadmap'}_roadmap.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('📥 Download started!', 'success');
+        });
+
+        document.getElementById('roadmapClearHistoryBtn').addEventListener('click', () => {
+            if (!confirm('Delete all roadmap history?')) return;
+            roadmaps = [];
+            setLS('roadmaps', roadmaps);
+            renderRoadmapHistory();
+            showToast('🗑️ History cleared', 'info');
+        });
+        renderRoadmapHistory();
+
+        // ─── FLASHCARDS ─────────────────────────────────────────────
+        let flashcards = getLS('flashcards', []);
+        let flashcardStudyMode = false;
+        let flashcardIndex = 0;
+
+        function renderFlashcards() {
+            const list = document.getElementById('flashcardList');
+            list.innerHTML = '';
+            if (flashcards.length === 0) { list.innerHTML =
+                    '<div class="text-gray-400 dark:text-gray-500 text-sm">No cards yet. Add some!</div>';
+                document.getElementById('flashcardCount').textContent = '0'; return; }
+            flashcards.forEach((c, i) => { const div = document.createElement('div');
+                div.className =
+                    'flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/30 rounded-lg text-sm';
+                div.innerHTML =
+                    `<span><strong>${c.front}</strong> → ${c.back}</span><button class="text-red-600 hover:text-red-800" data-flashcard-del="${i}">✕</button>`;
+                list.appendChild(div); });
+            document.getElementById('flashcardCount').textContent = flashcards.length;
+            list.querySelectorAll('[data-flashcard-del]').forEach(btn => { btn.addEventListener('click', () => { const idx =
+                        parseInt(btn.dataset.flashcardDel);
+                    flashcards.splice(idx, 1);
+                    setLS('flashcards', flashcards);
+                    renderFlashcards();
+                    showToast('🗑️ Card removed', 'info'); }); });
+        }
+
+        document.getElementById('flashcardAddBtn').addEventListener('click', () => {
+            const front = document.getElementById('flashcardFront').value.trim();
+            const back = document.getElementById('flashcardBack').value.trim();
+            if (!front || !back) { showToast('Please fill in both front and back.', 'error'); return; }
+            flashcards.push({ front, back, id: generateId() });
+            setLS('flashcards', flashcards);
+            document.getElementById('flashcardFront').value = '';
+            document.getElementById('flashcardBack').value = '';
+            renderFlashcards();
+            showToast('✅ Card added!', 'success');
+        });
+
+        document.getElementById('flashcardStudyBtn').addEventListener('click', () => {
+            if (flashcards.length === 0) { showToast('No cards to study. Add some first!', 'error'); return; }
+            flashcardStudyMode = !flashcardStudyMode;
+            flashcardIndex = 0;
+            if (flashcardStudyMode) {
+                document.getElementById('flashcardStudyDisplay').innerHTML =
+                    `<div class="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-lg"><div class="text-lg font-bold">${flashcards[0].front}</div><div class="text-sm text-gray-500 mt-2">Click to flip</div></div>`;
+                document.getElementById('flashcardStudyDisplay').style.cursor = 'pointer';
+                document.getElementById('flashcardStudyDisplay').onclick = () => {
+                    const card = flashcards[flashcardIndex];
+                    if (!card) return;
+                    const current = document.getElementById('flashcardStudyDisplay').innerHTML;
+                    if (current.includes(card.front)) {
+                        document.getElementById('flashcardStudyDisplay').innerHTML =
+                            `<div class="p-4 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg shadow-lg"><div class="text-lg">${card.back}</div><div class="text-sm text-gray-500 mt-2">Click for next</div></div>`;
+                    } else {
+                        flashcardIndex = (flashcardIndex + 1) % flashcards.length;
+                        const next = flashcards[flashcardIndex];
+                        document.getElementById('flashcardStudyDisplay').innerHTML =
+                            `<div class="p-4 bg-white dark:bg-gray-700 rounded-lg shadow-lg"><div class="text-lg font-bold">${next.front}</div><div class="text-sm text-gray-500 mt-2">Click to flip</div></div>`;
+                    }
+                };
+                showToast('📖 Study mode on! Click cards to flip.', 'info');
+            } else {
+                document.getElementById('flashcardStudyDisplay').innerHTML = '🃏';
+                document.getElementById('flashcardStudyDisplay').style.cursor = 'default';
+                document.getElementById('flashcardStudyDisplay').onclick = null;
+                showToast('Study mode off.', 'info');
+            }
+        });
+
+        document.getElementById('flashcardExportBtn').addEventListener('click', () => {
+            if (flashcards.length === 0) { showToast('No cards to export.', 'error'); return; }
+            const text = flashcards.map(c => `${c.front} → ${c.back}`).join('\n');
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `flashcards_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('📥 Flashcards exported!', 'success');
+        });
+
+        document.getElementById('flashcardClearBtn').addEventListener('click', () => {
+            if (!confirm('Delete all flashcards?')) return;
+            flashcards = [];
+            setLS('flashcards', flashcards);
+            renderFlashcards();
+            document.getElementById('flashcardStudyDisplay').innerHTML = '🃏';
+            showToast('🗑️ All cards cleared', 'info');
+        });
+        renderFlashcards();
+
+        // ─── COVER LETTER ──────────────────────────────────────────
+        document.getElementById('clGenerateBtn').addEventListener('click', () => {
+            const name = document.getElementById('clName').value.trim() || 'Your Name';
+            const email = document.getElementById('clEmail').value.trim() || 'your@email.com';
+            const company = document.getElementById('clCompany').value.trim() || 'Company';
+            const position = document.getElementById('clPosition').value.trim() || 'Position';
+            const reason = document.getElementById('clReason').value.trim() ||
+                'I am passionate about this role.';
+            const letter =
+                `${name}\n${email}\n\n${new Date().toLocaleDateString()}\n\nHiring Manager\n${company}\n\nDear Hiring Manager,\n\nI am writing to express my interest in the ${position} position at ${company}. ${reason}\n\nI am confident that my skills and experience make me a strong candidate for this role. I look forward to the opportunity to discuss how I can contribute to ${company}'s success.\n\nSincerely,\n${name}`;
+            document.getElementById('clPreview').textContent = letter;
+            window._currentCoverLetter = letter;
+            showToast('✉️ Cover letter generated!', 'success');
+            document.getElementById('clStatus').textContent = '✅ Generated!';
+        });
+
+        document.getElementById('clDownloadBtn').addEventListener('click', () => {
+            const letter = window._currentCoverLetter;
+            if (!letter) { showToast('Generate a cover letter first.', 'error'); return; }
+            const blob = new Blob([letter], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `cover_letter_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('📥 Download started!', 'success');
+        });
+
+        // ─── STUDY PLANNER ─────────────────────────────────────────
+        let studyTasks = getLS('studyTasks', []);
+
+        function renderStudyTasks() {
+            const list = document.getElementById('spTaskList');
+            list.innerHTML = '';
+            if (studyTasks.length === 0) { list.innerHTML =
+                    '<div class="text-gray-400 dark:text-gray-500 text-sm">No tasks yet.</div>';
+                document.getElementById('spStats').textContent = 'Total: 0 | Done: 0';
+                document.getElementById('spProgressBar').style.width = '0%';
+                document.getElementById('spStreak').textContent = '0 days'; return; }
+            const done = studyTasks.filter(t => t.status === 'Done').length;
+            studyTasks.forEach((t, i) => { const div = document.createElement('div');
+                div.className =
+                    'flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800/30 rounded-lg text-sm';
+                const statusEmoji = t.status === 'Done' ? '✅' : t.status === 'In Progress' ? '🔄' : '⏳';
+                div.innerHTML =
+                    `<span>${statusEmoji} <strong>${t.task}</strong> (${t.priority}) - ${t.date}</span><button class="text-red-600 hover:text-red-800" data-sp-del="${i}">✕</button>`;
+                list.appendChild(div); });
+            document.getElementById('spStats').textContent = `Total: ${studyTasks.length} | Done: ${done}`;
+            const pct = studyTasks.length > 0 ? Math.round((done / studyTasks.length) * 100) : 0;
+            document.getElementById('spProgressBar').style.width = pct + '%';
+            document.getElementById('spStreak').textContent = Math.floor(Math.random() * 10) + 1 + ' days';
+            list.querySelectorAll('[data-sp-del]').forEach(btn => { btn.addEventListener('click', () => { const idx =
+                        parseInt(btn.dataset.spDel);
+                    studyTasks.splice(idx, 1);
+                    setLS('studyTasks', studyTasks);
+                    renderStudyTasks();
+                    showToast('🗑️ Task removed', 'info'); }); });
+        }
+
+        document.getElementById('spAddBtn').addEventListener('click', () => {
+            const task = document.getElementById('spTask').value.trim();
+            const date = document.getElementById('spDate').value;
+            const priority = document.getElementById('spPriority').value;
+            const status = document.getElementById('spStatus').value;
+            if (!task) { showToast('Please enter a task.', 'error'); return; }
+            studyTasks.push({ task, date: date || new Date().toISOString().slice(0, 10), priority, status,
+                id: generateId() });
+            setLS('studyTasks', studyTasks);
+            document.getElementById('spTask').value = '';
+            renderStudyTasks();
+            showToast('✅ Task added!', 'success');
+        });
+
+        document.getElementById('spExportBtn').addEventListener('click', () => {
+            if (studyTasks.length === 0) { showToast('No tasks to export.', 'error'); return; }
+            const text = studyTasks.map(t => `${t.status} | ${t.task} | ${t.priority} | ${t.date}`).join('\n');
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `study_planner_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('📥 Planner exported!', 'success');
+        });
+
+        document.getElementById('spClearBtn').addEventListener('click', () => {
+            if (!confirm('Delete all tasks?')) return;
+            studyTasks = [];
+            setLS('studyTasks', studyTasks);
+            renderStudyTasks();
+            showToast('🗑️ All tasks cleared', 'info');
+        });
+        renderStudyTasks();
+
+        // ─── SAVED FILES ──────────────────────────────────────────
+        function renderSavedFiles() {
+            const list = document.getElementById('savedFilesList');
+            const allData = { resumes: getLS('resumes', []), portfolios: getLS('portfolios', []), notes: getLS(
+                    'notes', []), quizzes: getLS('quizzes', []), roadmaps: getLS('roadmaps', []),
+                flashcards: getLS('flashcards', []), studyTasks: getLS('studyTasks', []) };
+            const total = Object.values(allData).reduce((acc, arr) => acc + arr.length, 0);
+            if (total === 0) { list.innerHTML =
+                    '<div class="text-gray-400 dark:text-gray-500 text-sm">No saved files yet.</div>'; return; }
+            let html = `<div class="text-sm text-gray-500 dark:text-gray-400 mb-2">Total items: ${total}</div>`;
+            Object.entries(allData).forEach(([key, arr]) => { if (arr.length > 0) { html +=
+                        `<div><span class="font-medium">${key}:</span> ${arr.length} items</div>`; } });
+            list.innerHTML = html;
+        }
+
+        document.getElementById('savedClearBtn').addEventListener('click', () => {
+            if (!confirm('Delete ALL saved data? This cannot be undone.')) return;
+            const keys = ['resumes', 'portfolios', 'notes', 'quizzes', 'roadmaps', 'flashcards', 'studyTasks'];
+            keys.forEach(k => setLS(k, []));
+            resumes = [];
+            portfolios = [];
+            notes = [];
+            quizzes = [];
+            roadmaps = [];
+            flashcards = [];
+            studyTasks = [];
+            renderSavedFiles();
+            renderResumeSelector();
+            renderPortfolioSelector();
+            renderNotesHistory();
+            renderQuizHistory();
+            renderRoadmapHistory();
+            renderFlashcards();
+            renderStudyTasks();
+            showToast('🗑️ All data cleared', 'info');
+        });
+        renderSavedFiles();
+
+        // ─── SETTINGS: EXPORT / CLEAR DATA ──────────────────────
+        document.getElementById('settingsExportData').addEventListener('click', () => {
+            const allData = {};
+            const keys = ['user', 'profile', 'resumes', 'portfolios', 'notes', 'quizzes', 'roadmaps', 'flashcards',
+                'studyTasks', 'leaderboard', 'darkMode', 'currentPage'
+            ];
+            keys.forEach(k => { allData[k] = getLS(k, null); });
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `aihub_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showToast('📤 Data exported!', 'success');
+        });
+
+        document.getElementById('settingsClearData').addEventListener('click', () => {
+            if (!confirm('Delete ALL data? This cannot be undone.')) return;
+            const keys = ['user', 'profile', 'resumes', 'portfolios', 'notes', 'quizzes', 'roadmaps', 'flashcards',
+                'studyTasks', 'leaderboard', 'darkMode', 'currentPage'
+            ];
+            keys.forEach(k => localStorage.removeItem('aihub_' + k));
+            location.reload();
+        });
+
+        // ─── STORAGE USAGE ──────────────────────────────────────
+        function updateStorageUsage() {
+            let total = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('aihub_')) { total += localStorage.getItem(key).length; }
+            }
+            document.getElementById('settingsStorage').textContent = Math.round(total / 1024) + ' KB';
+        }
+        updateStorageUsage();
+
+        // ─── LOAD SETTINGS ON PAGE LOAD ──────────────────────────
+        loadSettings();
+
+        console.log('🚀 AI Student Career Hub loaded with improved mock responses!');
+        console.log('✅ No API key required – uses built-in mock for all topics.');
+    </script>
+
+</body>
+</html>
