@@ -2880,7 +2880,12 @@
 
         // ─── LOAD SETTINGS ON PAGE LOAD ──────────────────────────
         loadSettings();
-
+        <!-- 1. Load the Firebase SDKs first -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+        <script>
         console.log('🚀 AI Student Career Hub loaded with improved mock responses!');
         console.log('✅ No API key required – uses built-in mock for all topics.');
 const firebaseConfig = {
@@ -2897,10 +2902,5 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 console.log("Firebase initialized successfully");
     </script>
-        <!-- Load the Firebase SDKs (Compat version) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </body>
 </html>
